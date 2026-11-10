@@ -1,0 +1,303 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================
+   GLOBAL LIGHT & DARK THEME
+========================================== */
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-ivory text-charcoal font-sans antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply tracking-tight font-semibold text-charcoal;
+  }
+
+  /* DARK MODE */
+  html.dark body {
+    background-color: #071F2B;
+    color: #E5F1EF;
+  }
+
+  html.dark h1,
+  html.dark h2,
+  html.dark h3,
+  html.dark h4,
+  html.dark h5,
+  html.dark h6 {
+    color: #E5F1EF;
+  }
+
+  html.dark input,
+  html.dark textarea,
+  html.dark select {
+    background-color: #102F39;
+    color: #E5F1EF;
+    border-color: #28535A;
+  }
+
+  html.dark input::placeholder,
+  html.dark textarea::placeholder {
+    color: #91AAA7;
+  }
+}
+
+/* ==========================================
+   COMPONENTS
+========================================== */
+
+@layer components {
+
+  .page-container {
+    @apply space-y-8 max-w-7xl mx-auto;
+  }
+
+  .page-header {
+    @apply flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-sage/40 pb-5;
+  }
+
+  .form-input {
+    @apply w-full px-3.5 py-2.5 rounded-lg border border-sage/50 bg-white text-sm text-charcoal
+      placeholder:text-charcoal-light/60 focus:outline-none focus:ring-2 focus:ring-teal/30 focus:border-teal
+      transition-all duration-200;
+  }
+
+  html.dark .form-input {
+    background-color: #102F39;
+    color: #E5F1EF;
+    border-color: #28535A;
+  }
+
+  .form-label {
+    @apply block text-xs font-bold uppercase tracking-wider text-charcoal-light mb-1.5;
+  }
+
+  html.dark .form-label {
+    color: #A8C5C0;
+  }
+
+  .step-pill {
+    @apply flex items-center gap-2 px-3 py-1.5 rounded-full bg-ivory-dark border border-sage/40 text-xs font-semibold text-charcoal-light;
+  }
+
+  .step-pill.active {
+    @apply bg-teal text-white border-teal;
+  }
+
+  html.dark .step-pill {
+    background-color: #102F39;
+    color: #B8D4CE;
+    border-color: #28535A;
+  }
+
+  html.dark .step-pill.active {
+    background-color: #087E83;
+    color: white;
+  }
+}
+
+/* ==========================================
+   DARK MODE — COMMON SURFACES
+========================================== */
+
+html.dark .bg-white {
+  background-color: #102F39;
+}
+
+html.dark .bg-ivory {
+  background-color: #071F2B;
+}
+
+html.dark .bg-ivory\/50,
+html.dark .bg-ivory\/60,
+html.dark .bg-ivory\/80 {
+  background-color: #0B2933;
+}
+
+html.dark .text-charcoal {
+  color: #E5F1EF;
+}
+
+html.dark .text-charcoal-light {
+  color: #A8C5C0;
+}
+
+html.dark .border-sage,
+html.dark .border-sage\/20,
+html.dark .border-sage\/30,
+html.dark .border-sage\/40,
+html.dark .border-sage\/50 {
+  border-color: #28535A;
+}
+
+html.dark .divide-sage\/10 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #28535A;
+}
+
+/* ==========================================
+   SCROLLBAR
+========================================== */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #E8F0EC;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #7FA69B;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #087E83;
+}
+
+html.dark ::-webkit-scrollbar-track {
+  background: #071F2B;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: #28535A;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: #32B8B0;
+}
+
+/* ==========================================
+   SMOOTH TRANSITIONS
+========================================== */
+
+.transition-smooth {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ==========================================
+   TOOLTIP
+========================================== */
+
+.tooltip {
+  position: relative;
+  cursor: help;
+}
+
+.tooltip::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #071F2B;
+  color: #F4F5F0;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 5px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 100;
+}
+
+.tooltip:hover::after {
+  opacity: 1;
+}
+
+/* ==========================================
+   LOADING SPINNER
+========================================== */
+
+@keyframes spin-olive {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  border: 2px solid #D5DFD9;
+  border-top-color: #087E83;
+  border-radius: 50%;
+  animation: spin-olive 0.7s linear infinite;
+}
+
+html.dark .spinner {
+  border-color: #28535A;
+  border-top-color: #32B8B0;
+}
+
+/* ==========================================
+   GRADIENT TEXT
+========================================== */
+
+.gradient-text {
+  background: linear-gradient(135deg, #087E83, #071F2B);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+html.dark .gradient-text {
+  background: linear-gradient(135deg, #32B8B0, #91DAD0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ==========================================
+   WORKFLOW CONNECTOR
+========================================== */
+
+.workflow-step {
+  position: relative;
+}
+
+.workflow-step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 2px;
+  height: 24px;
+  background: linear-gradient(to bottom, #7FA69B, transparent);
+  transform: translateX(-50%);
+}
+
+html.dark .workflow-step:not(:last-child)::after {
+  background: linear-gradient(to bottom, #32B8B0, transparent);
+}
+
+/* ==========================================
+   PRINT STYLES
+========================================== */
+
+@media print {
+  aside,
+  header,
+  .no-print {
+    display: none !important;
+  }
+
+  main {
+    padding: 0 !important;
+  }
+
+  #handover-report {
+    border: none !important;
+    box-shadow: none !important;
+  }
+}

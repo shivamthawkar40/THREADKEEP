@@ -1,0 +1,7 @@
+DecisionID,Category,DecisionSummary,Rationale,DecidedBy,Date,Status,RiskLevel
+DEC-01,Architecture,Modular Multi-Stage Pipeline,Separates parsing from AI inference for auditability,Lead Architect,2026-09-12,Confirmed,Low
+DEC-02,Security,Enforce JWT with bcryptjs,Stateless authentication compliant with RFC 7519,Security Lead,2026-09-18,Confirmed,Medium
+DEC-03,Database,Migration to PostgreSQL for ACID ledger,Regulatory audit compliance mandates relational guarantees,Staff Architect,2026-10-04,Unresolved Conflict,Critical
+DEC-04,Testing,End-to-End QA Automation,Assigning QA Lead to write Cypress integration tests,Engineering Director,2026-10-15,Unassigned / TBD,High
+DEC-05,Infrastructure,Hosting Provider AWS vs GCP,Cost vs existing container maturity trade-off,DevOps Lead,2026-10-22,Unresolved Conflict,High
+DEC-06,Compliance,Financial Audit Trail Retention,Mandatory 7-year data persistence for banking compliance,Compliance Officer,2026-10-28,Confirmed,Critical

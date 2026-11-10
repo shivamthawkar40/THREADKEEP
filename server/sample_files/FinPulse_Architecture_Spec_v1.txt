@@ -1,0 +1,31 @@
+# FINPULSE: NEXT-GEN CORE BANKING PLATFORM
+## Technical Architecture Specification (v1.0.0)
+Document ID: DOC-FIN-001
+Author: Lead Systems Architect (SPY_2.O)
+Status: Approved
+
+### Section 1: Executive Overview & Objectives
+Goal: Architect a resilient, sub-100 millisecond core banking transaction settlement engine.
+Aim: Support 10,000 transactions per second with real-time auditability and multi-tenant ledger isolation.
+Target Audience: Tier-1 digital banks, payment service providers, and neo-banking operations.
+
+### Section 2: Technical Architecture & System Components
+The FinPulse platform is engineered as a decoupled, multi-tier microservice system:
+1. Client Presentation Layer: Built with React.js (v18.3) and Tailwind CSS for high-density transactional financial dashboards.
+2. API Gateway & Auth Service: Node.js reverse proxy handling JWT authentication (RFC 7519), rate limiting, and request sanitization.
+3. Core Ledger Service: Node.js Express service orchestrating double-entry bookkeeping transactions.
+4. Database Persistence Store: MongoDB (v7.0) configured as the primary persistence layer for flexible financial document models, rapid schema iteration, and high write throughput.
+5. Cloud Infrastructure: Hosted on Amazon Web Services (AWS) using AWS ECS Fargate containers and AWS S3 for ledger archive storage.
+
+### Section 3: Technology Stack
+- Frontend: React.js, Tailwind CSS, Axios, Lucide Icons
+- Backend: Node.js, Express.js REST API
+- Primary Database: MongoDB with Mongoose ODM
+- Cache Layer: Redis cluster (v7.2)
+- Cloud & Hosting: Amazon Web Services (AWS ECS / S3)
+- Authentication: JSON Web Tokens (JWT) with bcryptjs password encryption
+
+### Section 4: Completed Tasks & Workstreams
+- Task C1: Core banking REST API specification finalized. Owner: Lead Developer.
+- Task C2: Double-entry ledger data models designed. Owner: Database Engineer.
+- Task C3: JWT authentication and role-based access control implemented. Owner: Security Architect.

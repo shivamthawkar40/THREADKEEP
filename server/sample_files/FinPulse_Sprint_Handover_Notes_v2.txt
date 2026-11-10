@@ -1,0 +1,35 @@
+# FINPULSE: SPRINT 8 HANDOVER & DEPARTURE NOTES
+## Operational Update & Team Transition Briefing
+Document ID: DOC-FIN-002
+Author: Departing Senior Backend Contributor
+Date: October 2026
+Status: In Review
+
+### Section 1: Urgent Architectural Shifts & Contradictions
+1. Database Migration:
+During Sprint 8 security audit, the compliance officer raised strict concerns regarding transactional ACID guarantees for regulatory audits.
+Consequently, we decided to migrate the primary database from MongoDB to PostgreSQL (v16).
+All new core accounting ledger schemas were rewritten in PostgreSQL with foreign key constraints.
+MongoDB is currently deprecated and should not be used for transactional persistence.
+
+2. Cloud Deployment Shift:
+Due to high data transfer and egress costs on AWS, leadership decided to migrate staging and production workloads to Google Cloud Platform (GCP Cloud Run).
+Do not deploy to AWS ECS; all container targets are currently being prepared for GCP.
+
+### Section 2: Incomplete Workstreams & Knowledge Gaps
+1. End-to-End Testing Suite:
+- Status: Incomplete / Missing.
+- Task Owner: Unassigned (TBD).
+- Details: We have no integration tests or automated regression suites. The previous QA contractor left without committing the test runner.
+- Blocker: Critical risk of regressions during incoming team onboarding.
+
+2. Production Deployment Runbook:
+- Status: Missing documentation.
+- We have no automated CI/CD pipeline script or production Dockerfile committed. Incoming developers will not know the environment secrets or exact deploy sequence.
+
+3. Open Architectural Question:
+- Question: Should we implement Redis as a separate managed instance or rely on distributed in-memory caching? Investigation was never completed before my departure.
+
+### Section 3: Third-Party Integrations & Risks
+- Payment Gateway: Stripe Connect is integrated for deposit processing.
+- Unclear Dependency: Stripe webhook rate-limits and retry policies were not documented. High volume bursts could drop unhandled webhook events.
