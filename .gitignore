@@ -36,3 +36,19 @@ Thumbs.db
 # Temporary Files
 *.tmp
 *.log
+# Local backups and diagnostics
+.history/
+backups/
+**/*backup*
+**/*.bak
+**/*.before-*
+**/*diagnose*.js
+**/diagnose-*.js
+**/inspect-*.js
+**/verify-*.js
+**/restore-*.js
+server/conflict-test-*.txt
+server/services/companion-ai-snippet.txt
+client/*-audit.txt
+client/app-layout-remaining.txt
+client-frontend-review.zip
