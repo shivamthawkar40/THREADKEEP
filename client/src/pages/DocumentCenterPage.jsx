@@ -209,7 +209,7 @@ const DocumentCenterPage = () => {
 
   // Delete document
   const handleDelete = async (docId, docName) => {
-    if (!window.confirm(`Delete document "${docName}"?`)) {
+    if (!window.confirm(`Move document "${docName}" to Trash?`)) {
       return;
     }
 
@@ -217,7 +217,7 @@ const DocumentCenterPage = () => {
       await api.delete(`/documents/${docId}`);
 
       addToast(
-        `Document "${docName}" removed.`,
+        `Document "${docName}" moved to Trash.`,
         'success'
       );
 
@@ -235,18 +235,18 @@ const DocumentCenterPage = () => {
   const getDocIcon = (type) => {
     switch (type) {
       case 'pdf':
-        return <FileBox className="w-5 h-5 text-coral-dark" />;
+        return <FileBox className="w-5 h-5 text-[#737F85]" />;
 
       case 'docx':
-        return <FileText className="w-5 h-5 text-teal" />;
+        return <FileText className="w-5 h-5 text-[#525354]" />;
 
       case 'csv':
         return (
-          <FileSpreadsheet className="w-5 h-5 text-gold-dark" />
+          <FileSpreadsheet className="w-5 h-5 text-[#525354]" />
         );
 
       default:
-        return <FileCode className="w-5 h-5 text-sage-dark" />;
+        return <FileCode className="w-5 h-5 text-[#737F85]" />;
     }
   };
 
@@ -260,20 +260,20 @@ const DocumentCenterPage = () => {
     <div className="space-y-6 max-w-7xl mx-auto">
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-sage/30 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#B7C5CC] pb-5">
 
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-black text-charcoal">
+            <h1 className="text-2xl font-black text-[#181818]">
               Document Center
             </h1>
 
-            <Badge variant="teal">
+            <Badge variant="aqua">
               Ingestion & Extraction
             </Badge>
           </div>
 
-          <p className="text-xs text-charcoal-light mt-1">
+          <p className="text-xs text-[#181818]-light mt-1">
             Upload PDF, DOCX, CSV, or TXT project records.
             THREADKEEP extracts text and maps line citations.
           </p>
@@ -319,24 +319,24 @@ const DocumentCenterPage = () => {
         onDrop={handleDrop}
         className={`border-2 border-dashed rounded-2xl p-8 text-center transition-all ${
           dragActive
-            ? 'border-teal bg-mint/50 scale-[1.01]'
-            : 'border-sage/50 bg-white hover:bg-ivory/50'
+            ? 'border-[#737F85] bg-[#B8C8D7]/50 scale-[1.01]'
+            : 'border-[#B7C5CC] bg-white hover:bg-[#DEE5E8]/50'
         }`}
       >
         <div className="max-w-md mx-auto space-y-3">
 
-          <div className="w-12 h-12 rounded-xl bg-mint text-teal flex items-center justify-center mx-auto shadow-soft">
+          <div className="w-12 h-12 rounded-xl bg-[#B8C8D7] text-[#525354] flex items-center justify-center mx-auto shadow-soft">
             <UploadCloud className="w-6 h-6" />
           </div>
 
           <div>
-            <h3 className="text-sm font-bold text-charcoal">
+            <h3 className="text-sm font-bold text-[#181818]">
               Drag & Drop Project Documents Here
             </h3>
 
-            <p className="text-xs text-charcoal-light mt-1">
+            <p className="text-xs text-[#181818]-light mt-1">
               Supports{' '}
-              <strong className="text-teal">
+              <strong className="text-[#525354]">
                 PDF, Word (DOCX), CSV tables, and TXT
               </strong>{' '}
               notes up to 25MB each.
@@ -357,33 +357,33 @@ const DocumentCenterPage = () => {
       {/* Documents List */}
       <Card className="p-6 space-y-4">
 
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-ivory-dark pb-4">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-[#B7C5CC] pb-4">
 
           <div className="flex items-center gap-2">
-            <h3 className="text-sm font-bold text-charcoal">
+            <h3 className="text-sm font-bold text-[#181818]">
               Project Records ({documents.length})
             </h3>
 
-            <span className="text-[11px] font-mono text-charcoal-light">
+            <span className="text-[11px] font-mono text-[#181818]-light">
               Workspace: {currentProject?.key || 'None'}
             </span>
           </div>
 
           <div className="relative w-full sm:w-64">
-            <Search className="w-3.5 h-3.5 text-charcoal-light absolute left-3 top-2.5" />
+            <Search className="w-3.5 h-3.5 text-[#181818]-light absolute left-3 top-2.5" />
 
             <input
               type="text"
               placeholder="Search documents..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-8 pr-3 py-1.5 rounded-lg border border-sage/40 bg-ivory text-xs focus:outline-none focus:ring-1 focus:ring-teal"
+              className="w-full pl-8 pr-3 py-1.5 rounded-lg border border-[#B7C5CC] bg-[#DEE5E8] text-xs focus:outline-none focus:ring-1 focus:ring-[#B8C8D7]"
             />
           </div>
         </div>
 
         {loading ? (
-          <div className="text-center py-10 text-sm text-charcoal-light">
+          <div className="text-center py-10 text-sm text-[#181818]-light">
             Loading documents...
           </div>
         ) : filteredDocs.length > 0 ? (
@@ -392,7 +392,7 @@ const DocumentCenterPage = () => {
             <table className="w-full text-left text-xs">
 
               <thead>
-                <tr className="border-b border-sage/20 text-charcoal-light uppercase tracking-wider text-[10px]">
+                <tr className="border-b border-[#B7C5CC] text-[#181818]-light uppercase tracking-wider text-[10px]">
                   <th className="py-2.5 px-3">Document</th>
                   <th className="py-2.5 px-3">Type</th>
                   <th className="py-2.5 px-3">Word Count</th>
@@ -402,11 +402,11 @@ const DocumentCenterPage = () => {
                 </tr>
               </thead>
 
-              <tbody className="divide-y divide-sage/10">
+              <tbody className="divide-y divide-[#B7C5CC]">
                 {filteredDocs.map((doc) => (
                   <tr
                     key={doc._id}
-                    className="hover:bg-ivory/80 transition-colors"
+                    className="hover:bg-[#DEE5E8]/80 transition-colors"
                   >
 
                     <td className="py-3 px-3">
@@ -414,13 +414,13 @@ const DocumentCenterPage = () => {
                         {getDocIcon(doc.fileType)}
 
                         <div>
-                          <div className="font-semibold text-charcoal">
+                          <div className="font-semibold text-[#181818]">
                             {doc.originalName}
                           </div>
 
-                          <div className="text-[10px] text-charcoal-light font-mono">
+                          <div className="text-[10px] text-[#181818]-light font-mono">
                             {((doc.size || 0) / 1024).toFixed(1)} KB
-                            {' • '}
+                            {' Ã¢â‚¬Â¢ '}
                             {doc.createdAt
                               ? new Date(doc.createdAt).toLocaleDateString()
                               : ''}
@@ -430,16 +430,16 @@ const DocumentCenterPage = () => {
                     </td>
 
                     <td className="py-3 px-3">
-                      <span className="font-mono uppercase font-bold text-[10px] px-2 py-0.5 rounded bg-sage/20 text-charcoal">
+                      <span className="font-mono uppercase font-bold text-[10px] px-2 py-0.5 rounded bg-[#B7C5CC] text-[#181818]">
                         {doc.fileType}
                       </span>
                     </td>
 
-                    <td className="py-3 px-3 font-mono text-charcoal">
+                    <td className="py-3 px-3 font-mono text-[#181818]">
                       {doc.wordCount?.toLocaleString() || 0}
                     </td>
 
-                    <td className="py-3 px-3 font-mono text-charcoal">
+                    <td className="py-3 px-3 font-mono text-[#181818]">
                       {doc.pageCount || 1} pgs (
                       {doc.sections?.length || 1} sec)
                     </td>
@@ -448,8 +448,8 @@ const DocumentCenterPage = () => {
                       <Badge
                         variant={
                           doc.status === 'processed'
-                            ? 'teal'
-                            : 'coral'
+                            ? 'aqua'
+                            : 'sage'
                         }
                       >
                         {doc.status}
@@ -462,7 +462,7 @@ const DocumentCenterPage = () => {
                           setSelectedDoc(doc);
                           setViewerModalOpen(true);
                         }}
-                        className="p-1.5 rounded text-charcoal hover:text-teal hover:bg-mint"
+                        className="p-1.5 rounded text-[#181818] hover:text-[#525354] hover:bg-[#B8C8D7]"
                         title="Inspect Extracted Text"
                       >
                         <Eye className="w-4 h-4" />
@@ -472,8 +472,8 @@ const DocumentCenterPage = () => {
                         onClick={() =>
                           handleDelete(doc._id, doc.originalName)
                         }
-                        className="p-1.5 rounded text-charcoal-light hover:text-coral-dark hover:bg-rose-50"
-                        title="Delete Document"
+                        className="p-1.5 rounded text-[#181818]-light hover:text-[#737F85] hover:bg-[#B7C5CC]"
+                        title="Move to Trash"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -486,7 +486,7 @@ const DocumentCenterPage = () => {
           </div>
 
         ) : (
-          <div className="text-center py-10 text-xs text-charcoal-light">
+          <div className="text-center py-10 text-xs text-[#181818]-light">
             No documents found. Drag & drop files above to start extraction.
           </div>
         )}
@@ -502,25 +502,25 @@ const DocumentCenterPage = () => {
         {selectedDoc && (
           <div className="space-y-4">
 
-            <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-lg bg-ivory border border-sage/20 text-xs">
+            <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-lg bg-[#DEE5E8] border border-[#B7C5CC] text-xs">
 
               <div className="flex items-center gap-2">
-                <Badge variant="teal">
+                <Badge variant="aqua">
                   {selectedDoc.fileType?.toUpperCase()}
                 </Badge>
 
-                <span className="font-mono text-charcoal font-semibold">
+                <span className="font-mono text-[#181818] font-semibold">
                   {selectedDoc.wordCount || 0} words
                 </span>
 
-                <span>•</span>
+                <span>Ã¢â‚¬Â¢</span>
 
-                <span className="font-mono text-charcoal font-semibold">
+                <span className="font-mono text-[#181818] font-semibold">
                   {selectedDoc.pageCount || 1} pages
                 </span>
               </div>
 
-              <div className="text-[11px] text-charcoal-light font-mono">
+              <div className="text-[11px] text-[#181818]-light font-mono">
                 Ingested:{' '}
                 {selectedDoc.createdAt
                   ? new Date(selectedDoc.createdAt).toLocaleString()
@@ -529,7 +529,7 @@ const DocumentCenterPage = () => {
             </div>
 
             <div className="space-y-2">
-              <div className="text-xs font-bold uppercase tracking-wider text-charcoal-light">
+              <div className="text-xs font-bold uppercase tracking-wider text-[#181818]-light">
                 Extracted Sections with Line References
               </div>
 
@@ -538,33 +538,33 @@ const DocumentCenterPage = () => {
                   selectedDoc.sections.map((sec, idx) => (
                     <div
                       key={idx}
-                      className="p-3.5 rounded-lg border border-sage/20 bg-ivory/60 space-y-1.5"
+                      className="p-3.5 rounded-lg border border-[#B7C5CC] bg-[#DEE5E8]/60 space-y-1.5"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-semibold text-xs text-teal">
-                          § {sec.title || `Section ${idx + 1}`}
+                        <span className="font-semibold text-xs text-[#525354]">
+                          Ã‚Â§ {sec.title || `Section ${idx + 1}`}
                         </span>
 
-                        <span className="font-mono text-[10px] text-charcoal-light bg-white px-2 py-0.5 rounded border border-sage/20">
-                          Page {sec.page || 1} • Line{' '}
+                        <span className="font-mono text-[10px] text-[#181818]-light bg-white px-2 py-0.5 rounded border border-[#B7C5CC]">
+                          Page {sec.page || 1} Ã¢â‚¬Â¢ Line{' '}
                           {sec.lineStart || 1}
                         </span>
                       </div>
 
-                      <pre className="text-xs font-mono text-charcoal whitespace-pre-wrap leading-relaxed">
+                      <pre className="text-xs font-mono text-[#181818] whitespace-pre-wrap leading-relaxed">
                         {sec.content}
                       </pre>
                     </div>
                   ))
                 ) : (
-                  <p className="text-sm text-charcoal-light">
+                  <p className="text-sm text-[#181818]-light">
                     No extracted sections available.
                   </p>
                 )}
               </div>
             </div>
 
-            <div className="flex justify-end pt-3 border-t border-ivory-dark">
+            <div className="flex justify-end pt-3 border-t border-[#B7C5CC]">
               <Button
                 variant="outline"
                 size="sm"
@@ -582,3 +582,4 @@ const DocumentCenterPage = () => {
 };
 
 export default DocumentCenterPage;
+

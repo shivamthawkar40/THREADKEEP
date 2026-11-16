@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+﻿import React, { useState, useRef, useEffect } from 'react';
 import { NavLink, Link, Outlet, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -14,6 +14,7 @@ import {
   LogOut,
   ChevronDown,
   Sparkles,
+  Bot,
   BookOpen,
   Plus,
   Layers,
@@ -21,6 +22,7 @@ import {
   X,
   Moon,
   Sun,
+  Trash2,
   ArrowRight,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -69,6 +71,8 @@ const toggleTheme = () => {
     { name: 'Dashboard', path: '/app/dashboard', icon: LayoutDashboard },
     { name: 'Projects', path: '/app/projects', icon: FolderGit2, badge: projects.length },
     { name: 'Document Center', path: '/app/documents', icon: FileText, badge: currentProject?.stats?.totalDocuments },
+    { name: 'Trash', path: '/app/trash', icon: Trash2 },
+    { name: 'AI Project Companion', path: currentProject?._id ? `/app/projects/${currentProject._id}/companion` : '/app/projects', icon: Bot },
     { name: 'AI Reconstruction', path: '/app/reconstruction', icon: Cpu },
     { name: 'Knowledge Gap Radar', path: '/app/gaps', icon: Radar, badge: currentProject?.stats?.openGaps, badgeVariant: 'coral' },
     { name: 'Conflict Detection', path: '/app/conflicts', icon: GitCompare, badge: currentProject?.stats?.unresolvedConflicts, badgeVariant: 'gold' },
@@ -81,24 +85,24 @@ const toggleTheme = () => {
   const navGroups = [
     {
       label: 'Workspace',
-      items: navigation.slice(0, 3),
+      items: navigation.slice(0, 4),
     },
     {
       label: 'AI Analysis Pipeline',
-      items: navigation.slice(3, 7),
+      items: navigation.slice(4, 9),
     },
     {
       label: 'Review & Delivery',
-      items: navigation.slice(7, 9),
+      items: navigation.slice(9, 11),
     },
     {
       label: 'System',
-      items: navigation.slice(9),
+      items: navigation.slice(11),
     },
   ];
 
   const SidebarNav = () => (
-    <nav className="flex-1 px-3 py-4 overflow-y-auto space-y-5">
+    <nav className="flex-1 min-h-0 px-3 py-4 overflow-y-auto overflow-x-hidden overscroll-contain space-y-5">
       {navGroups.map((group) => (
         <div key={group.label}>
           <div className="px-3 mb-1.5 text-[10px] uppercase font-bold tracking-widest text-white/30">
@@ -116,20 +120,20 @@ const toggleTheme = () => {
                     flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold
                     transition-all duration-150
                     ${isActive
-                      ? 'bg-teal text-ivory shadow-soft'
+                      ? 'bg-[#B8C8D7] text-[#181818] shadow-soft'
                       : 'text-white/60 hover:text-white hover:bg-white/10'
                     }
                   `}
                 >
                   <div className="flex items-center gap-2.5">
-                    <Icon className={`w-4 h-4 ${isActive ? 'text-ivory' : 'text-white/50'}`} />
+                    <Icon className={`w-4 h-4 ${isActive ? 'text-[#181818]' : 'text-white/50'}`} />
                     <span>{item.name}</span>
                   </div>
                   {item.badge !== undefined && item.badge > 0 && (
                     <span className={`
                       text-[10px] font-bold px-1.5 py-0.5 rounded-md
-                      ${item.badgeVariant === 'coral' ? 'bg-coral/30 text-coral-light' :
-                        item.badgeVariant === 'gold' ? 'bg-gold/30 text-gold' :
+                      ${item.badgeVariant === 'coral' ? 'bg-[#B7C5CC] text-[#2B2C2C]' :
+                        item.badgeVariant === 'gold' ? 'bg-[#DEE5E8] text-[#525354]' :
                         'bg-white/15 text-white/80'}
                     `}>
                       {item.badge}
@@ -145,13 +149,13 @@ const toggleTheme = () => {
   );
 
   return (
-    <div className="min-h-screen flex bg-ivory dark:bg-[#071F2B] transition-colors duration-300">
-      {/* Desktop Sidebar — Dark Olive */}
-      <aside className="hidden lg:flex flex-col w-64 flex-shrink-0" style={{ background: 'linear-gradient(180deg, #2C2E1E 0%, #1E2015 100%)' }}>
+    <div className="h-screen w-full flex overflow-hidden bg-[#DEE5E8] dark:bg-[#181818] transition-colors duration-300">
+      {/* Desktop Sidebar ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Dark Olive */}
+      <aside className="hidden lg:flex flex-col w-64 h-screen flex-shrink-0 overflow-hidden sticky top-0" style={{ background: 'linear-gradient(180deg, #2B2C2C 0%, #181818 100%)' }}>
         {/* Brand */}
         <div className="h-16 px-5 border-b border-white/10 flex items-center gap-3 flex-shrink-0">
-          <div className="w-8 h-8 rounded-xl bg-teal flex items-center justify-center shadow-soft flex-shrink-0">
-            <BookOpen className="w-4 h-4 text-ivory" />
+          <div className="w-8 h-8 rounded-xl bg-[#181818] flex items-center justify-center shadow-soft flex-shrink-0">
+            <BookOpen className="w-4 h-4 text-white" />
           </div>
           <div>
             <div className="font-black text-sm text-white tracking-tight">THREADKEEP</div>
@@ -166,17 +170,17 @@ const toggleTheme = () => {
             <div className="flex items-center justify-between gap-2">
               <div className="min-w-0">
                 <div className="text-xs font-bold text-white truncate">{currentProject.name}</div>
-                <div className="text-[10px] text-teal font-medium truncate">{currentProject.targetDomain}</div>
+                <div className="text-[10px] text-[#525354] font-medium truncate">{currentProject.targetDomain}</div>
               </div>
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-md bg-teal/20 text-teal font-bold uppercase flex-shrink-0">
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-md bg-[#B8C8D7] text-[#525354] font-bold uppercase flex-shrink-0">
                 {currentProject.key}
               </span>
             </div>
           ) : (
             <div>
               <div className="text-xs text-white/40">No project selected</div>
-              <Link to="/app/projects/create" className="text-[10px] text-teal font-semibold hover:underline">
-                Create one →
+              <Link to="/app/projects/create" className="text-[10px] text-[#525354] font-semibold hover:underline">
+                Create one ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢
               </Link>
             </div>
           )}
@@ -192,9 +196,9 @@ const toggleTheme = () => {
             disabled={sampleLoading}
             className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-[11px] font-semibold
               text-white/60 hover:text-white hover:bg-white/8 transition-all border border-white/10
-              hover:border-teal/30 disabled:opacity-50"
+              hover:border-[#95A1A6] disabled:opacity-50"
           >
-            <Sparkles className={`w-3.5 h-3.5 ${sampleLoading ? 'animate-spin text-teal' : 'text-teal'}`} />
+            <Sparkles className={`w-3.5 h-3.5 ${sampleLoading ? 'animate-spin text-[#525354]' : 'text-[#525354]'}`} />
             {sampleLoading ? 'Loading sample...' : 'Load FinPulse Sample'}
           </button>
         </div>
@@ -202,7 +206,7 @@ const toggleTheme = () => {
         {/* User Card */}
         <div className="p-3 border-t border-white/10 flex items-center justify-between flex-shrink-0">
           <div className="flex items-center gap-2.5 min-w-0 mr-2">
-            <div className="w-8 h-8 rounded-full bg-teal flex items-center justify-center font-black text-xs text-ivory flex-shrink-0 shadow-soft">
+            <div className="w-8 h-8 rounded-full bg-[#181818] flex items-center justify-center font-black text-xs text-white flex-shrink-0 shadow-soft">
               {user?.name?.charAt(0)?.toUpperCase() || 'U'}
             </div>
             <div className="min-w-0">
@@ -213,7 +217,7 @@ const toggleTheme = () => {
           <button
             onClick={logout}
             title="Sign Out"
-            className="p-1.5 rounded-lg text-white/40 hover:text-coral hover:bg-white/10 transition-colors flex-shrink-0"
+            className="p-1.5 rounded-lg text-white/40 hover:text-[#B7C5CC] hover:bg-white/10 transition-colors flex-shrink-0"
           >
             <LogOut className="w-4 h-4" />
           </button>
@@ -221,29 +225,29 @@ const toggleTheme = () => {
       </aside>
 
       {/* Main Container */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <div className="flex-1 h-screen flex flex-col min-w-0 min-h-0 overflow-hidden">
         {/* Top Navbar */}
-        <header className="h-16 border-b border-sage/30 bg-white/95 dark:bg-[#0B2933]/95 dark:border-white/10 backdrop-blur-md px-4 md:px-6 flex items-center justify-between sticky top-0 z-30 flex-shrink-0 transition-colors duration-300">
-          {/* Left — Mobile menu + Project switcher */}
+        <header className="h-16 border-b border-[#B7C5CC] bg-white/95 dark:bg-[#2B2C2C]/95 dark:border-[#525354] backdrop-blur-md px-4 md:px-6 flex items-center justify-between sticky top-0 z-30 flex-shrink-0 transition-colors duration-300">
+          {/* Left ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Mobile menu + Project switcher */}
           <div className="flex items-center gap-3">
             <button
   onClick={toggleTheme}
   title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
   aria-label="Toggle dark mode"
-  className="p-2.5 rounded-xl border border-sage/40
-    bg-ivory text-charcoal hover:bg-mint
+  className="p-2.5 rounded-xl border border-[#B7C5CC]
+    bg-[#DEE5E8] text-[#2B2C2C] hover:bg-[#DEE5E8]
     transition-all duration-300"
 >
   {darkMode ? (
-    <Sun className="w-5 h-5 text-gold" />
+    <Sun className="w-5 h-5 text-[#B7C5CC]" />
   ) : (
-    <Moon className="w-5 h-5 text-teal" />
+    <Moon className="w-5 h-5 text-[#525354]" />
   )}
 </button>
             {/* Mobile hamburger */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 rounded-xl text-charcoal hover:bg-mint transition-colors"
+              className="lg:hidden p-2 rounded-xl text-[#2B2C2C] hover:bg-[#DEE5E8] transition-colors"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -252,34 +256,34 @@ const toggleTheme = () => {
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setProjectDropdownOpen(!projectDropdownOpen)}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-sage/50
-                  bg-ivory text-xs font-semibold text-charcoal
-                  hover:bg-mint hover:border-teal/30 transition-all"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#B7C5CC]
+                  bg-[#DEE5E8] text-xs font-semibold text-[#2B2C2C]
+                  hover:bg-[#DEE5E8] hover:border-[#95A1A6] transition-all"
               >
-                <Layers className="w-3.5 h-3.5 text-teal" />
+                <Layers className="w-3.5 h-3.5 text-[#525354]" />
                 <span className="max-w-[160px] truncate hidden sm:block">
                   {currentProject?.name || 'Select Project'}
                 </span>
-                <ChevronDown className={`w-3.5 h-3.5 text-charcoal-light transition-transform ${projectDropdownOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-3.5 h-3.5 text-[#737F85] transition-transform ${projectDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {projectDropdownOpen && (
-                <div className="absolute left-0 mt-1.5 w-72 bg-white rounded-2xl border border-sage/40 shadow-elevated py-2 z-50 animate-fade-in">
-                  <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-charcoal-light border-b border-ivory-dark flex justify-between items-center">
+                <div className="absolute left-0 mt-1.5 w-72 bg-white rounded-2xl border border-[#B7C5CC] shadow-elevated py-2 z-50 animate-fade-in">
+                  <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-[#737F85] border-b border-[#B7C5CC] flex justify-between items-center">
                     <span>Projects ({projects.length})</span>
                     <Link
                       to="/app/projects/create"
                       onClick={() => setProjectDropdownOpen(false)}
-                      className="text-teal hover:underline flex items-center gap-1 font-semibold normal-case"
+                      className="text-[#525354] hover:underline flex items-center gap-1 font-semibold normal-case"
                     >
                       <Plus className="w-3 h-3" /> New
                     </Link>
                   </div>
                   <div className="max-h-56 overflow-y-auto py-1">
                     {projects.length === 0 ? (
-                      <div className="px-3 py-4 text-xs text-charcoal-light text-center">
+                      <div className="px-3 py-4 text-xs text-[#737F85] text-center">
                         No projects yet.{' '}
-                        <Link to="/app/projects/create" className="text-teal hover:underline font-semibold">
+                        <Link to="/app/projects/create" className="text-[#525354] hover:underline font-semibold">
                           Create one
                         </Link>
                       </div>
@@ -289,12 +293,12 @@ const toggleTheme = () => {
                           key={p._id}
                           onClick={() => { selectProject(p._id); setProjectDropdownOpen(false); }}
                           className={`w-full text-left px-3 py-2.5 text-xs flex items-center justify-between
-                            hover:bg-mint/50 transition-colors gap-2
-                            ${p._id === currentProject?._id ? 'bg-teal/8 font-bold text-teal' : 'text-charcoal'}`}
+                            hover:bg-[#DEE5E8]/50 transition-colors gap-2
+                            ${p._id === currentProject?._id ? 'bg-[#B8C8D7] font-bold text-[#181818]' : 'text-[#2B2C2C]'}`}
                         >
                           <div className="min-w-0">
                             <div className="truncate font-semibold">{p.name}</div>
-                            <div className="text-[10px] text-charcoal-light truncate">{p.targetDomain}</div>
+                            <div className="text-[10px] text-[#737F85] truncate">{p.targetDomain}</div>
                           </div>
                           <HealthScoreBadge score={p.healthScore || 0} size="sm" />
                         </button>
@@ -308,25 +312,25 @@ const toggleTheme = () => {
             {currentProject && (
               <Link
                 to={`/app/projects/${currentProject._id}`}
-                className="hidden md:block text-xs text-charcoal-light hover:text-teal font-medium transition-colors"
+                className="hidden md:block text-xs text-[#737F85] hover:text-[#525354] font-medium transition-colors"
               >
                 Overview
               </Link>
             )}
           </div>
 
-          {/* Right — Health badge */}
+          {/* Right ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Health badge */}
           <div className="flex items-center gap-3">
             {currentProject && (
-              <div className="hidden md:flex items-center gap-2 text-xs text-charcoal-light">
+              <div className="hidden md:flex items-center gap-2 text-xs text-[#737F85]">
                 <span>Health:</span>
                 <HealthScoreBadge score={currentProject.healthScore || 0} size="sm" />
               </div>
             )}
             <Link
               to="/app/projects/create"
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal text-ivory
-                text-xs font-semibold hover:bg-teal-dark transition-colors shadow-soft"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#B8C8D7] text-[#181818]
+                text-xs font-semibold hover:bg-[#2B2C2C] transition-colors shadow-soft"
             >
               <Plus className="w-3.5 h-3.5" />
               New Project
@@ -337,8 +341,8 @@ const toggleTheme = () => {
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
           <div
-            className="lg:hidden animate-slide-up border-b border-sage/30 overflow-y-auto"
-            style={{ background: 'linear-gradient(180deg, #2C2E1E 0%, #1E2015 100%)', maxHeight: '70vh' }}
+            className="lg:hidden animate-slide-up border-b border-[#B7C5CC] overflow-y-auto"
+            style={{ background: 'linear-gradient(180deg, #2B2C2C 0%, #181818 100%)', maxHeight: '70vh' }}
           >
             <div className="p-3 space-y-0.5">
               {navigation.map((item) => {
@@ -351,7 +355,7 @@ const toggleTheme = () => {
                     className={`
                       flex items-center justify-between p-2.5 rounded-xl text-xs font-semibold
                       transition-colors
-                      ${isActive ? 'bg-teal text-ivory' : 'text-white/60 hover:text-white hover:bg-white/10'}
+                      ${isActive ? 'bg-[#B8C8D7] text-[#181818]' : 'text-white/60 hover:text-white hover:bg-white/10'}
                     `}
                   >
                     <div className="flex items-center gap-2.5">
@@ -371,7 +375,7 @@ const toggleTheme = () => {
         )}
 
         {/* Content Body */}
-        <main className="flex-1 overflow-y-auto p-5 md:p-8 bg-ivory dark:bg-[#071F2B] transition-colors duration-300">
+        <main className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-5 md:p-8 bg-[#DEE5E8] dark:bg-[#181818] transition-colors duration-300">
           <Outlet />
         </main>
       </div>
@@ -380,3 +384,14 @@ const toggleTheme = () => {
 };
 
 export default AppLayout;
+
+
+
+
+
+
+
+
+
+
+

@@ -20,15 +20,25 @@ const sampleRoutes = require('./routes/sampleRoutes');
 const app = express();
 
 // Middleware
+const allowedOrigins = new Set([
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+]);
+
 app.use(cors({
-  origin: true,
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.has(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error('CORS origin not allowed'));
+  },
   credentials: true,
 }));
 app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ extended: true, limit: '20mb' }));
 
 // Static file serving for uploads (PDFs, docs)
-app.use('/uploads', express.static(UPLOAD_DIR));
 
 // Static client bundle serving (single-port production deployment support)
 const clientDistPath = path.resolve(__dirname, '../client/dist');

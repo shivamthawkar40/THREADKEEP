@@ -22,26 +22,26 @@ export const ToastProvider = ({ children }) => {
   const getIcon = (type) => {
     switch (type) {
       case 'success':
-        return <CheckCircle2 className="w-5 h-5 text-teal" />;
+        return <CheckCircle2 className="w-5 h-5 text-[#525354]" />;
       case 'warning':
-        return <AlertTriangle className="w-5 h-5 text-gold-dark" />;
+        return <AlertTriangle className="w-5 h-5 text-[#737F85]" />;
       case 'error':
-        return <AlertCircle className="w-5 h-5 text-coral-dark" />;
+        return <AlertCircle className="w-5 h-5 text-[#525354]" />;
       default:
-        return <Info className="w-5 h-5 text-teal" />;
+        return <Info className="w-5 h-5 text-[#525354]" />;
     }
   };
 
   const getBorderColor = (type) => {
     switch (type) {
       case 'success':
-        return 'border-teal bg-mint-light';
+        return 'border-[#B7C5CC] bg-[#B8C8D7]';
       case 'warning':
-        return 'border-gold bg-amber-50/70';
+        return 'border-[#B7C5CC] bg-[#DEE5E8]';
       case 'error':
-        return 'border-coral bg-rose-50/70';
+        return 'border-[#525354] bg-[#B7C5CC]';
       default:
-        return 'border-sage bg-ivory';
+        return 'border-[#B7C5CC] bg-[#DEE5E8]';
     }
   };
 
@@ -59,15 +59,15 @@ export const ToastProvider = ({ children }) => {
             <div className="flex-shrink-0 mr-3 mt-0.5">{getIcon(toast.type)}</div>
             <div className="flex-1 mr-2">
               {toast.title && (
-                <h4 className="text-xs font-bold uppercase tracking-wider text-charcoal">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-[#181818]">
                   {toast.title}
                 </h4>
               )}
-              <p className="text-sm font-medium text-charcoal leading-snug">{toast.message}</p>
+              <p className="text-sm font-medium text-[#181818] leading-snug">{toast.message}</p>
             </div>
             <button
               onClick={() => removeToast(toast.id)}
-              className="flex-shrink-0 text-charcoal-light hover:text-charcoal p-1"
+              className="flex-shrink-0 text-[#737F85] hover:text-[#181818] p-1"
             >
               <X className="w-4 h-4" />
             </button>
@@ -85,3 +85,4 @@ export const useToast = () => {
   }
   return context;
 };
+

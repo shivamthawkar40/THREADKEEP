@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+﻿const mongoose = require('mongoose');
 
 const knowledgeGapSchema = new mongoose.Schema({
   project: {
@@ -45,8 +45,11 @@ const knowledgeGapSchema = new mongoose.Schema({
     default: '',
   },
   evidence: [{
+    documentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Document' },
     documentName: String,
     pageNumber: Number,
+    sectionTitle: String,
+    lineRange: String,
     excerpt: String,
   }],
   suggestedQuestion: {
@@ -79,3 +82,4 @@ const knowledgeGapSchema = new mongoose.Schema({
 });
 
 module.exports = mongoose.model('KnowledgeGap', knowledgeGapSchema);
+

@@ -20,13 +20,13 @@ const verifiedItemSchema = new mongoose.Schema({
   status: {
     type: String,
     enum: ['confirmed', 'inferred', 'unknown'],
-    default: 'confirmed',
+    default: 'unknown',
   },
   confidenceScore: {
     type: Number,
     min: 0,
     max: 100,
-    default: 85,
+    default: 0,
   },
   sources: [citationSchema],
   rationale: String,
@@ -47,18 +47,26 @@ const extractedKnowledgeSchema = new mongoose.Schema({
     required: true,
     index: true,
   },
+
   version: {
     type: Number,
     default: 1,
   },
+
   overview: {
     summary: String,
     problemStatement: String,
     targetAudience: String,
-    status: { type: String, enum: ['confirmed', 'inferred', 'unknown'], default: 'confirmed' },
+    status: {
+      type: String,
+      enum: ['confirmed', 'inferred', 'unknown'],
+      default: 'unknown',
+    },
     sources: [citationSchema],
   },
+
   objectives: [verifiedItemSchema],
+
   technicalArchitecture: {
     overview: String,
     pattern: String,
@@ -73,66 +81,110 @@ const extractedKnowledgeSchema = new mongoose.Schema({
     diagramEdges: [mongoose.Schema.Types.Mixed],
     sources: [citationSchema],
   },
+
   technologyStack: [{
-    category: String, // Frontend, Backend, Database, Cloud, etc.
+    category: String,
     technology: String,
     version: String,
-    status: { type: String, enum: ['confirmed', 'inferred', 'unknown'], default: 'confirmed' },
+    status: {
+      type: String,
+      enum: ['confirmed', 'inferred', 'unknown'],
+      default: 'unknown',
+    },
     sources: [citationSchema],
   }],
+
   decisions: [{
     decision: String,
     rationale: String,
     alternativesConsidered: String,
     decidedBy: String,
     date: String,
-    status: { type: String, enum: ['confirmed', 'inferred', 'unknown'], default: 'confirmed' },
+    status: {
+      type: String,
+      enum: ['confirmed', 'inferred', 'unknown'],
+      default: 'unknown',
+    },
     sources: [citationSchema],
   }],
+
   completedTasks: [verifiedItemSchema],
   pendingTasks: [verifiedItemSchema],
+
   teamResponsibilities: [{
     name: String,
     role: String,
     responsibilities: [String],
     ownershipAreas: [String],
-    status: { type: String, enum: ['confirmed', 'inferred', 'unknown'], default: 'confirmed' },
+    status: {
+      type: String,
+      enum: ['confirmed', 'inferred', 'unknown'],
+      default: 'unknown',
+    },
     sources: [citationSchema],
   }],
+
   dependencies: [{
     item: String,
     dependsOn: String,
-    type: { type: String, enum: ['internal', 'external', 'third_party'] },
-    status: { type: String, enum: ['resolved', 'pending', 'blocked'] },
+    type: {
+      type: String,
+      enum: ['internal', 'external', 'third_party'],
+    },
+    status: {
+      type: String,
+      enum: ['resolved', 'pending', 'blocked'],
+    },
     impact: String,
     sources: [citationSchema],
   }],
+
   risks: [{
     title: String,
     description: String,
-    impact: { type: String, enum: ['critical', 'high', 'medium', 'low'] },
-    likelihood: { type: String, enum: ['high', 'medium', 'low'] },
+    impact: {
+      type: String,
+      enum: ['critical', 'high', 'medium', 'low'],
+    },
+    likelihood: {
+      type: String,
+      enum: ['high', 'medium', 'low'],
+    },
     mitigation: String,
     sources: [citationSchema],
   }],
+
   milestones: [{
     title: String,
     targetDate: String,
-    status: { type: String, enum: ['completed', 'in_progress', 'delayed', 'unknown'] },
+    status: {
+      type: String,
+      enum: ['completed', 'in_progress', 'delayed', 'unknown'],
+    },
     sources: [citationSchema],
   }],
+
   confidenceStats: {
-    confirmedPercentage: Number,
-    inferredPercentage: Number,
-    unknownPercentage: Number,
-    overallHealthScore: Number,
+    totalFacts: { type: Number, default: 0 },
+    confirmedCount: { type: Number, default: 0 },
+    inferredCount: { type: Number, default: 0 },
+    unknownCount: { type: Number, default: 0 },
+    confirmedPercentage: { type: Number, default: 0 },
+    inferredPercentage: { type: Number, default: 0 },
+    unknownPercentage: { type: Number, default: 100 },
+    overallHealthScore: { type: Number, default: 0 },
   },
+
   extractedBy: {
     type: String,
     default: 'THREADKEEP Intelligence Engine',
   },
+
 }, {
   timestamps: true,
 });
 
-module.exports = mongoose.model('ExtractedKnowledge', extractedKnowledgeSchema);
+module.exports = mongoose.model(
+  'ExtractedKnowledge',
+  extractedKnowledgeSchema
+);

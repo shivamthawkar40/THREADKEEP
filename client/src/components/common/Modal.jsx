@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+﻿import React, { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 
 const Modal = ({ isOpen, onClose, title, children, maxWidth = 'max-w-lg' }) => {
@@ -27,22 +27,22 @@ const Modal = ({ isOpen, onClose, title, children, maxWidth = 'max-w-lg' }) => {
       onClick={(e) => { if (e.target === overlayRef.current) onClose(); }}
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-charcoal-dark/50 backdrop-blur-sm animate-fade-in" />
+      <div className="absolute inset-0 bg-[#181818]/50 backdrop-blur-sm animate-fade-in" />
 
       {/* Dialog */}
       <div
         className={`
-          relative w-full ${maxWidth} bg-white rounded-2xl shadow-elevated
-          border border-sage/30 animate-slide-up
+          relative w-full ${maxWidth} bg-white dark:bg-[#242729] text-slate-900 dark:text-slate-100 rounded-2xl shadow-elevated
+          border border-slate-200 dark:border-white/10 animate-slide-up
           max-h-[90vh] flex flex-col
         `}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-ivory-dark flex-shrink-0">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-white/10 flex-shrink-0">
           <h3 className="text-sm font-bold text-charcoal">{title}</h3>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-charcoal-light hover:text-charcoal hover:bg-mint transition-colors"
+            className="p-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
             aria-label="Close modal"
           >
             <X className="w-4 h-4" />
@@ -59,3 +59,5 @@ const Modal = ({ isOpen, onClose, title, children, maxWidth = 'max-w-lg' }) => {
 };
 
 export default Modal;
+
+

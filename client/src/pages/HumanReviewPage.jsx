@@ -133,13 +133,13 @@ const HumanReviewPage = () => {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-sage/30 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#B7C5CC] pb-5">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-black text-charcoal">Human Review Center</h1>
-            <Badge variant="teal">Architect Verification Queue</Badge>
+            <h1 className="text-2xl font-black text-[#181818]">Human Review Center</h1>
+            <Badge variant="aqua">Architect Verification Queue</Badge>
           </div>
-          <p className="text-xs text-charcoal-light mt-0.5">
+          <p className="text-xs text-[#737F85] mt-0.5">
             Maintain high rigor: approve, reject, or edit extracted facts so AI inferences are never falsely represented as verified.
           </p>
         </div>
@@ -152,13 +152,13 @@ const HumanReviewPage = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-sage/30 gap-2">
+      <div className="flex border-b border-[#B7C5CC] gap-2">
         <button
           onClick={() => setActiveTab('queue')}
           className={`px-4 py-2 text-xs font-bold transition-all border-b-2 ${
             activeTab === 'queue'
-              ? 'border-teal text-teal bg-mint/30'
-              : 'border-transparent text-charcoal-light hover:text-charcoal'
+              ? 'border-[#737F85] text-[#525354] bg-[#B8C8D7]/30'
+              : 'border-transparent text-[#737F85] hover:text-[#181818]'
           }`}
         >
           Review Queue ({queueItems.length})
@@ -167,8 +167,8 @@ const HumanReviewPage = () => {
           onClick={() => setActiveTab('history')}
           className={`px-4 py-2 text-xs font-bold transition-all border-b-2 ${
             activeTab === 'history'
-              ? 'border-teal text-teal bg-mint/30'
-              : 'border-transparent text-charcoal-light hover:text-charcoal'
+              ? 'border-[#737F85] text-[#525354] bg-[#B8C8D7]/30'
+              : 'border-transparent text-[#737F85] hover:text-[#181818]'
           }`}
         >
           Audit History ({reviews.length})
@@ -184,26 +184,26 @@ const HumanReviewPage = () => {
                 key={item.id}
                 className={`p-5 space-y-3 transition-all ${
                   item.reviewStatus === 'approved'
-                    ? 'border-teal/30 bg-mint-light/20'
+                    ? 'border-[#737F85]/30 bg-[#B8C8D7]/30'
                     : item.reviewStatus === 'rejected'
-                    ? 'border-coral/40 bg-coral/10'
-                    : 'border-sage/40 bg-white'
+                    ? 'border-[#B7C5CC] bg-[#B7C5CC]/40'
+                    : 'border-[#B7C5CC] bg-white'
                 }`}
               >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-sage/20 pb-2.5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#B7C5CC] pb-2.5">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono uppercase font-bold text-[10px] px-2 py-0.5 rounded bg-sage/20 text-charcoal">
+                    <span className="font-mono uppercase font-bold text-[10px] px-2 py-0.5 rounded bg-[#B7C5CC] text-[#181818]">
                       {item.type}
                     </span>
-                    <h3 className="font-bold text-sm text-charcoal">{item.title}</h3>
+                    <h3 className="font-bold text-sm text-[#181818]">{item.title}</h3>
                   </div>
 
                   <Badge
                     variant={
                       item.reviewStatus === 'approved'
-                        ? 'teal'
+                        ? 'aqua'
                         : item.reviewStatus === 'rejected'
-                        ? 'coral'
+                        ? 'sage'
                         : 'gray'
                     }
                   >
@@ -211,19 +211,19 @@ const HumanReviewPage = () => {
                   </Badge>
                 </div>
 
-                <p className="text-xs text-charcoal-light leading-relaxed">
+                <p className="text-xs text-[#737F85] leading-relaxed">
                   {item.description}
                 </p>
 
                 {item.citation && (
-                  <div className="p-2.5 rounded bg-ivory border border-sage/20 text-[11px] text-charcoal font-serif italic">
+                  <div className="p-2.5 rounded bg-[#DEE5E8] border border-[#B7C5CC] text-[11px] text-[#181818] font-serif italic">
                     "{item.citation.excerpt}"
                   </div>
                 )}
 
                 <div className="flex items-center justify-between pt-2">
-                  <div className="text-[11px] text-charcoal-light font-mono">
-                    Citation: {item.citation?.documentName || 'Document record'} • Pg {item.citation?.pageNumber || 1}
+                  <div className="text-[11px] text-[#737F85] font-mono">
+                    Citation: {item.citation?.documentName || 'Document record'} Ã¢â‚¬Â¢ Pg {item.citation?.pageNumber || 1}
                   </div>
 
                   <div className="flex items-center gap-2">
@@ -256,7 +256,7 @@ const HumanReviewPage = () => {
               </Card>
             ))
           ) : (
-            <Card className="p-12 text-center text-xs text-charcoal-light">
+            <Card className="p-12 text-center text-xs text-[#737F85]">
               No items in the review queue. Run reconstruction or load the sample banking dataset first.
             </Card>
           )}
@@ -266,52 +266,52 @@ const HumanReviewPage = () => {
       {/* Audit History View */}
       {activeTab === 'history' && (
         <Card className="p-6 space-y-4">
-          <div className="flex items-center justify-between border-b border-ivory-dark pb-3">
-            <h3 className="text-sm font-bold text-charcoal">Human Audit & Ratification Trail</h3>
-            <Badge variant="teal">Tamper-Evident Records</Badge>
+          <div className="flex items-center justify-between border-b border-[#B7C5CC] pb-3">
+            <h3 className="text-sm font-bold text-[#181818]">Human Audit & Ratification Trail</h3>
+            <Badge variant="aqua">Tamper-Evident Records</Badge>
           </div>
 
           {reviews.length > 0 ? (
             <div className="space-y-3">
               {reviews.map((rev) => (
-                <div key={rev._id} className="p-3.5 rounded-lg bg-ivory border border-sage/20 space-y-1.5 text-xs">
+                <div key={rev._id} className="p-3.5 rounded-lg bg-[#DEE5E8] border border-[#B7C5CC] space-y-1.5 text-xs">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-charcoal">
+                      <span className="font-bold text-[#181818]">
                         [{rev.itemType?.toUpperCase()}] {rev.itemId}
                       </span>
                       <Badge
                         variant={
                           rev.action === 'approved'
-                            ? 'teal'
+                            ? 'aqua'
                             : rev.action === 'rejected'
-                            ? 'coral'
-                            : 'gold'
+                            ? 'sage'
+                            : 'sage'
                         }
                         size="xs"
                       >
                         {rev.action}
                       </Badge>
                     </div>
-                    <span className="text-[10px] font-mono text-charcoal-light">
+                    <span className="text-[10px] font-mono text-[#737F85]">
                       {new Date(rev.createdAt).toLocaleString()}
                     </span>
                   </div>
 
                   {rev.comment && (
-                    <p className="text-charcoal text-[11px] font-medium">
+                    <p className="text-[#181818] text-[11px] font-medium">
                       Note: "{rev.comment}"
                     </p>
                   )}
 
-                  <div className="text-[10px] text-teal font-semibold">
+                  <div className="text-[10px] text-[#525354] font-semibold">
                     Audited by {rev.reviewerName || 'Team Lead'}
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="text-center py-10 text-xs text-charcoal-light">
+            <div className="text-center py-10 text-xs text-[#737F85]">
               No review decisions recorded yet. Approve or edit items in the queue above.
             </div>
           )}
@@ -327,31 +327,31 @@ const HumanReviewPage = () => {
       >
         {selectedItem && (
           <div className="space-y-4 text-xs">
-            <div className="p-3 rounded-lg bg-ivory border border-sage/30 space-y-1">
-              <span className="font-bold text-[10px] uppercase tracking-wider text-charcoal-light">
+            <div className="p-3 rounded-lg bg-[#DEE5E8] border border-[#B7C5CC] space-y-1">
+              <span className="font-bold text-[10px] uppercase tracking-wider text-[#737F85]">
                 Item Under Review
               </span>
-              <div className="font-semibold text-charcoal text-xs">
+              <div className="font-semibold text-[#181818] text-xs">
                 {selectedItem.title || selectedItem.decision}
               </div>
             </div>
 
             {reviewAction === 'edited' && (
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-charcoal mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#181818] mb-1.5">
                   Revised Statement Text *
                 </label>
                 <textarea
                   value={editedTitle}
                   onChange={(e) => setEditedTitle(e.target.value)}
                   rows={3}
-                  className="w-full px-3 py-2 rounded-lg border border-sage/40 bg-white text-xs focus:outline-none focus:ring-1 focus:ring-teal"
+                  className="w-full px-3 py-2 rounded-lg border border-[#B7C5CC] bg-white text-xs focus:outline-none focus:ring-1 focus:ring-[#B8C8D7]"
                 />
               </div>
             )}
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-charcoal mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#181818] mb-1.5">
                 Reviewer Comments & Justification
               </label>
               <textarea
@@ -359,11 +359,11 @@ const HumanReviewPage = () => {
                 onChange={(e) => setComment(e.target.value)}
                 rows={2}
                 placeholder="Optional notes explaining the reason for this approval, rejection, or edit..."
-                className="w-full px-3 py-2 rounded-lg border border-sage/40 bg-white text-xs focus:outline-none focus:ring-1 focus:ring-teal"
+                className="w-full px-3 py-2 rounded-lg border border-[#B7C5CC] bg-white text-xs focus:outline-none focus:ring-1 focus:ring-[#B8C8D7]"
               />
             </div>
 
-            <div className="flex justify-end gap-2 pt-3 border-t border-ivory-dark">
+            <div className="flex justify-end gap-2 pt-3 border-t border-[#B7C5CC]">
               <Button variant="outline" size="sm" onClick={() => setModalOpen(false)}>
                 Cancel
               </Button>
@@ -384,3 +384,4 @@ const HumanReviewPage = () => {
 };
 
 export default HumanReviewPage;
+

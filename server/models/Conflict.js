@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+﻿const mongoose = require('mongoose');
 
 const conflictSchema = new mongoose.Schema({
   project: {
@@ -35,6 +35,8 @@ const conflictSchema = new mongoose.Schema({
     documentName: { type: String, required: true },
     documentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Document' },
     pageNumber: Number,
+    sectionTitle: String,
+    lineRange: String,
     excerpt: { type: String, required: true },
   },
   statementB: {
@@ -42,11 +44,19 @@ const conflictSchema = new mongoose.Schema({
     documentName: { type: String, required: true },
     documentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Document' },
     pageNumber: Number,
+    sectionTitle: String,
+    lineRange: String,
     excerpt: { type: String, required: true },
   },
   conflictReason: {
     type: String,
     required: true,
+  },
+  verificationConfidence: {
+    type: Number,
+    min: 0,
+    max: 100,
+    default: null,
   },
   status: {
     type: String,
@@ -75,3 +85,5 @@ const conflictSchema = new mongoose.Schema({
 });
 
 module.exports = mongoose.model('Conflict', conflictSchema);
+
+

@@ -1,20 +1,19 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useCallback, useEffect, useState } from 'react';
 import {
   Cpu,
-  Layers,
-  CheckCircle2,
-  AlertTriangle,
-  Clock,
   Sparkles,
-  ArrowRight,
-  ShieldCheck,
   FileText,
-  HelpCircle,
-  Eye,
+  CheckCircle2,
+  Clock,
+  AlertTriangle,
+  ShieldCheck,
+  Layers,
+  Target,
+  Users,
   GitBranch,
-  Server,
-  Database,
-  Activity,
+  RefreshCw,
+  CalendarDays,
+  Info,
 } from 'lucide-react';
 import api from '../services/api';
 import { useProject } from '../context/ProjectContext';
@@ -22,647 +21,620 @@ import { useToast } from '../context/ToastContext';
 import Card from '../components/common/Card';
 import Button from '../components/common/Button';
 import Badge from '../components/common/Badge';
-import HealthScoreBadge from '../components/common/HealthScoreBadge';
 import Modal from '../components/common/Modal';
+
+const STEPS = [
+  'Document Ingestion',
+  'Text Extraction',
+  'Semantic Entity Linking',
+  'Knowledge Reconstruction',
+  'Gap Radar Analysis',
+  'Conflict Detection',
+  'Ready for Audit',
+];
+
+const TABS = [
+  { id: 'architecture', label: 'Architecture', icon: Layers },
+  { id: 'overview', label: 'Overview & Objectives', icon: Target },
+  { id: 'techstack', label: 'Technology Stack', icon: Cpu },
+  { id: 'decisions', label: 'Decisions', icon: ShieldCheck },
+  { id: 'tasks', label: 'Tasks', icon: CheckCircle2 },
+  { id: 'team', label: 'Team & Ownership', icon: Users },
+  { id: 'risks', label: 'Dependencies & Risks', icon: AlertTriangle },
+  { id: 'milestones', label: 'Milestones', icon: CalendarDays },
+];
+
+const asArray = (value) => (Array.isArray(value) ? value : []);
+const valueOr = (value, fallback = 'Not available in verified sources') =>
+  value === null || value === undefined || String(value).trim() === ''
+    ? fallback
+    : value;
+
+const StatusBadge = ({ status }) => {
+  const variant =
+    status === 'confirmed' ? 'aqua' : status === 'inferred' ? 'sage' : 'sage';
+  const label = status
+    ? status.charAt(0).toUpperCase() + status.slice(1)
+    : 'Unknown';
+  return <Badge variant={variant}>{label}</Badge>;
+};
+
+const EmptyState = ({ title = 'No verified information yet', detail, compact = false }) => (
+  <div className={`rounded-xl border border-dashed border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-center ${compact ? 'p-5' : 'p-8'}`}>
+    <Info className="w-5 h-5 text-slate-500 dark:text-slate-400 mx-auto mb-2" />
+    <p className="text-sm font-bold text-slate-900 dark:text-slate-100">{title}</p>
+    <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 max-w-lg mx-auto">
+      {detail || 'This section has no facts that passed evidence verification. Add relevant project documentation and run reconstruction again.'}
+    </p>
+  </div>
+);
+
+const SectionHeading = ({ title, count, children }) => (
+  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 dark:border-white/10 pb-3">
+    <div className="flex items-center gap-2">
+      <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">{title}</h3>
+      {count !== undefined && <Badge variant="sage">{count}</Badge>}
+    </div>
+    {children}
+  </div>
+);
 
 const ReconstructionPage = () => {
   const { currentProject, fetchProjects } = useProject();
   const { addToast } = useToast();
 
   const [knowledge, setKnowledge] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [reconstructing, setReconstructing] = useState(false);
   const [activeTab, setActiveTab] = useState('architecture');
-  const [currentStep, setCurrentStep] = useState(0); // 0 to 6
+  const [currentStep, setCurrentStep] = useState(0);
+  const [partialAnalysis, setPartialAnalysis] = useState(false);
   const [citationModal, setCitationModal] = useState({ open: false, citation: null });
 
-  const steps = [
-    'Document Ingestion',
-    'Text Extraction',
-    'Semantic Entity Linking',
-    'Knowledge Graph Reconstruction',
-    'Gap Radar Analysis',
-    'Conflict Matrix Detection',
-    'Ready for Audit',
-  ];
+  const fetchKnowledge = useCallback(async (projectId) => {
+    if (!projectId) {
+      setKnowledge(null);
+      setLoading(false);
+      return null;
+    }
 
-  const fetchKnowledge = async () => {
-    if (!currentProject) return;
     setLoading(true);
     try {
-      const res = await api.get(`/ai/knowledge/${currentProject._id}`);
-      if (res.data?.success) {
-        setKnowledge(res.data.knowledge);
-      }
-    } catch (err) {
-      console.warn('No knowledge yet:', err.response?.data?.message);
+      const response = await api.get(`/ai/knowledge/${projectId}`);
+      const nextKnowledge = response.data?.success
+        ? response.data.knowledge ?? null
+        : null;
+      setKnowledge(nextKnowledge);
+      return nextKnowledge;
+    } catch (error) {
+      setKnowledge(null);
+      console.warn(
+        'Knowledge fetch failed:',
+        error.response?.data?.message || error.message
+      );
+      return null;
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    fetchKnowledge();
-  }, [currentProject]);
+    setKnowledge(null);
+    setPartialAnalysis(false);
+    fetchKnowledge(currentProject?._id);
+  }, [currentProject?._id, fetchKnowledge]);
 
   const handleRunReconstruction = async () => {
-    if (!currentProject) {
-      addToast('Please select a project first.', 'warning');
+    if (!currentProject?._id || reconstructing) {
+      if (!currentProject?._id) addToast('Please select a project first.', 'warning');
       return;
     }
 
+    const projectId = currentProject._id;
     setReconstructing(true);
     setCurrentStep(0);
+    setPartialAnalysis(false);
 
-    // Multi-stage visual progress
-    const stepInterval = setInterval(() => {
-      setCurrentStep((prev) => {
-        if (prev < steps.length - 1) return prev + 1;
-        clearInterval(stepInterval);
-        return prev;
-      });
-    }, 600);
+    const stepInterval = window.setInterval(() => {
+      setCurrentStep((previous) =>
+        previous < STEPS.length - 1 ? previous + 1 : previous
+      );
+    }, 900);
 
     try {
-      const res = await api.post(`/ai/reconstruct/${currentProject._id}`);
-      if (res.data?.success) {
-        setKnowledge(res.data.knowledge);
-        addToast('Knowledge successfully reconstructed with citation references!', 'success');
-        await fetchProjects(currentProject._id);
+      const response = await api.post(`/ai/reconstruct/${projectId}`);
+
+      if (!response.data?.success) {
+        throw new Error(response.data?.message || 'Reconstruction could not be completed.');
       }
-    } catch (err) {
-      addToast(err.response?.data?.message || 'Reconstruction failed', 'error');
+
+      if (response.data.partial) {
+        setPartialAnalysis(true);
+        addToast(
+          'Partial analysis completed. Gemini was unavailable, so full knowledge reconstruction and gap detection were skipped.',
+          'warning'
+        );
+      } else {
+        addToast('Knowledge reconstruction completed. Verified facts are now available below.', 'success');
+      }
+
+      await fetchKnowledge(projectId);
+      await fetchProjects(projectId);
+    } catch (error) {
+      addToast(
+        error.response?.data?.message || error.message || 'Reconstruction failed.',
+        'error'
+      );
     } finally {
-      clearInterval(stepInterval);
-      setCurrentStep(steps.length - 1);
+      window.clearInterval(stepInterval);
+      setCurrentStep(STEPS.length - 1);
       setReconstructing(false);
     }
   };
 
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case 'confirmed':
-        return <Badge variant="teal">Confirmed</Badge>;
-      case 'inferred':
-        return <Badge variant="gold">Inferred</Badge>;
-      default:
-        return <Badge variant="coral">Unknown</Badge>;
-    }
+  const openCitation = (citation) => {
+    if (citation) setCitationModal({ open: true, citation });
   };
 
-  const tabs = [
-    { id: 'architecture', label: 'Technical Architecture' },
-    { id: 'objectives', label: 'Objectives & Overview' },
-    { id: 'techstack', label: 'Technology Stack' },
-    { id: 'decisions', label: 'Decisions & Rationale' },
-    { id: 'tasks', label: 'Tasks & Deliverables' },
-    { id: 'team', label: 'Team & Ownership' },
-    { id: 'risks', label: 'Dependencies & Risks' },
-  ];
+  const CitationButton = ({ citation, label = 'View source' }) => (
+    citation ? (
+      <button
+        type="button"
+        onClick={() => openCitation(citation)}
+        className="inline-flex items-center gap-1.5 text-[11px] font-bold text-slate-600 dark:text-slate-300 transition-colors hover:text-slate-900 dark:hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded-sm"
+      >
+        <FileText className="w-3.5 h-3.5" />
+        {label}
+      </button>
+    ) : null
+  );
+
+  const renderFactCard = (item, title, description, meta = null, key = title) => (
+    <Card key={key} className="p-4 space-y-3 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div className="min-w-0">
+          <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 break-words">{valueOr(title, 'Untitled fact')}</h4>
+          {meta && <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-1">{meta}</p>}
+        </div>
+        <StatusBadge status={item?.status} />
+      </div>
+      {description && (
+        <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-300 whitespace-pre-wrap">
+          {description}
+        </p>
+      )}
+      <div className="flex justify-end">
+        <CitationButton citation={item?.sources?.[0]} />
+      </div>
+    </Card>
+  );
+
+  const stats = knowledge?.confidenceStats || {};
+  const objectives = asArray(knowledge?.objectives);
+  const technologyStack = asArray(knowledge?.technologyStack);
+  const decisions = asArray(knowledge?.decisions);
+  const completedTasks = asArray(knowledge?.completedTasks);
+  const pendingTasks = asArray(knowledge?.pendingTasks);
+  const team = asArray(knowledge?.teamResponsibilities);
+  const dependencies = asArray(knowledge?.dependencies);
+  const risks = asArray(knowledge?.risks);
+  const milestones = asArray(knowledge?.milestones);
+  const architecture = knowledge?.technicalArchitecture || {};
+  const components = asArray(architecture.components);
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
-      {/* Top Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-sage/30 pb-5">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-black text-charcoal">AI Project Reconstruction</h1>
-            <Badge variant="teal">Deep Intelligence Engine</Badge>
+    <div className="max-w-7xl mx-auto space-y-6">
+      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-white/10 pb-5">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <h1 className="text-2xl font-black text-slate-900 dark:text-slate-100">AI Project Reconstruction</h1>
+            <Badge variant="aqua">Evidence-verified</Badge>
           </div>
-          <p className="text-xs text-charcoal-light mt-0.5">
-            Reconstructed facts, architectural decisions, and tasks extracted from ingested documents with line citations.
+          <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 max-w-2xl">
+            Rebuild project knowledge from uploaded documents, with verified citations and transparent unknowns.
           </p>
+          {currentProject?.name && (
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2">
+              Active project: <strong className="text-slate-600 dark:text-slate-300">{currentProject.name}</strong>
+            </p>
+          )}
         </div>
+        <Button
+          variant="dark"
+          size="sm"
+          icon={reconstructing ? RefreshCw : Sparkles}
+          loading={reconstructing}
+          onClick={handleRunReconstruction}
+          disabled={!currentProject?._id || reconstructing}
+        >
+          {knowledge ? 'Re-run Reconstruction' : 'Run Reconstruction'}
+        </Button>
+      </header>
 
-        <div className="flex items-center gap-3">
-          <Button
-            variant="primary"
-            size="sm"
-            icon={Sparkles}
-            loading={reconstructing}
-            onClick={handleRunReconstruction}
-          >
-            {knowledge ? 'Re-run Reconstruction' : 'Run Reconstruction'}
-          </Button>
-        </div>
-      </div>
-
-      {/* Progress Stepper during active reconstruction */}
       {reconstructing && (
-        <Card className="p-6 bg-mint-light/60 border-teal/40 space-y-4 animate-fade-in">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Cpu className="w-5 h-5 text-teal animate-spin" />
-              <span className="text-sm font-bold text-charcoal">
-                Reconstruction Pipeline in Progress...
-              </span>
+        <Card className="p-5 space-y-4 animate-fade-in">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-slate-100">
+              <Cpu className="w-5 h-5 animate-spin text-slate-600 dark:text-slate-300" />
+              Reconstruction pipeline running
             </div>
-            <span className="font-mono text-xs font-bold text-teal">
-              Step {currentStep + 1} of {steps.length}: {steps[currentStep]}
+            <span className="text-[11px] font-mono text-slate-600 dark:text-slate-300">
+              Step {currentStep + 1}/{STEPS.length}: {STEPS[currentStep]}
             </span>
           </div>
-
-          <div className="grid grid-cols-7 gap-2">
-            {steps.map((step, idx) => (
+          <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
+            {STEPS.map((step, index) => (
               <div key={step} className="space-y-1">
-                <div
-                  className={`h-2 rounded-full transition-all duration-300 ${
-                    idx <= currentStep ? 'bg-teal' : 'bg-sage/30'
-                  }`}
-                />
-                <div className="text-[10px] text-charcoal-light truncate text-center">
-                  {step}
-                </div>
+                <div className={`h-1.5 rounded-full ${index <= currentStep ? 'bg-[#525354]' : 'bg-[#B7C5CC]'}`} />
+                <p className="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 truncate">{step}</p>
               </div>
             ))}
           </div>
         </Card>
       )}
 
-      {/* Overview Stats Card */}
-      {knowledge && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <Card className="p-4 space-y-1">
-            <div className="text-[10px] uppercase font-bold tracking-wider text-charcoal-light">Reconstruction Health</div>
-            <div className="text-2xl font-black text-teal">
-              {knowledge.confidenceStats?.overallHealthScore || currentProject?.healthScore || 85}%
-            </div>
-            <div className="text-[11px] text-charcoal-light font-medium">Fact-backed confidence</div>
-          </Card>
-
-          <Card className="p-4 space-y-1">
-            <div className="text-[10px] uppercase font-bold tracking-wider text-charcoal-light">Confirmed Facts</div>
-            <div className="text-2xl font-black text-teal">
-              {knowledge.confidenceStats?.confirmedPercentage || 70}%
-            </div>
-            <div className="text-[11px] text-charcoal-light font-medium">Direct citations verified</div>
-          </Card>
-
-          <Card className="p-4 space-y-1">
-            <div className="text-[10px] uppercase font-bold tracking-wider text-charcoal-light">Inferred Scope</div>
-            <div className="text-2xl font-black text-gold-dark">
-              {knowledge.confidenceStats?.inferredPercentage || 20}%
-            </div>
-            <div className="text-[11px] text-charcoal-light font-medium">Derived from context</div>
-          </Card>
-
-          <Card className="p-4 space-y-1">
-            <div className="text-[10px] uppercase font-bold tracking-wider text-charcoal-light">Unknown Blindspots</div>
-            <div className="text-2xl font-black text-coral-dark">
-              {knowledge.confidenceStats?.unknownPercentage || 10}%
-            </div>
-            <div className="text-[11px] text-charcoal-light font-medium">Surfaced in Gap Radar</div>
-          </Card>
+      {partialAnalysis && (
+        <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-xs text-amber-900">
+          <strong>Partial analysis:</strong> local evidence checks ran, but full Gemini reconstruction and knowledge-gap analysis were skipped. Previously saved knowledge, if any, remains visible below.
         </div>
       )}
 
-      {/* Interactive Tabs */}
-      <div className="flex border-b border-sage/30 gap-1 overflow-x-auto">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2.5 text-xs font-bold transition-all border-b-2 whitespace-nowrap ${
-              activeTab === tab.id
-                ? 'border-teal text-teal bg-mint/30'
-                : 'border-transparent text-charcoal-light hover:text-charcoal hover:bg-ivory'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      {loading ? (
+        <Card className="p-10 text-center space-y-3">
+          <RefreshCw className="w-7 h-7 animate-spin text-slate-500 dark:text-slate-400 mx-auto" />
+          <p className="text-sm font-bold text-slate-900 dark:text-slate-100">Loading reconstructed knowledge…</p>
+          <p className="text-xs text-slate-600 dark:text-slate-300">Checking the latest saved reconstruction for this project.</p>
+        </Card>
+      ) : !currentProject ? (
+        <EmptyState
+          title="Select a project to continue"
+          detail="Choose a project from the project selector to view or reconstruct its knowledge."
+        />
+      ) : !knowledge ? (
+        <Card className="p-8 sm:p-12 text-center space-y-4">
+          <Cpu className="w-10 h-10 text-slate-500 dark:text-slate-400 mx-auto" />
+          <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">No reconstructed knowledge yet</h2>
+          <p className="text-xs text-slate-600 dark:text-slate-300 max-w-lg mx-auto">
+            Upload and process project documents first, then run reconstruction. Only facts supported by verifiable document evidence will be displayed.
+          </p>
+          <div className="flex justify-center">
+            <Button variant="primary" size="md" icon={Sparkles} onClick={handleRunReconstruction} loading={reconstructing}>
+              Run Reconstruction Pipeline
+            </Button>
+          </div>
+        </Card>
+      ) : (
+        <>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            {[
+              { label: 'Knowledge Health', value: stats.overallHealthScore, suffix: '%', note: 'Evidence-backed confidence' },
+              { label: 'Confirmed Facts', value: stats.confirmedPercentage, suffix: '%', note: `${stats.confirmedCount ?? 0} verified facts` },
+              { label: 'Inferred Facts', value: stats.inferredPercentage, suffix: '%', note: `${stats.inferredCount ?? 0} contextual facts` },
+              { label: 'Unknown Facts', value: stats.unknownPercentage, suffix: '%', note: `${stats.unknownCount ?? 0} unverified facts` },
+            ].map((stat) => (
+              <Card key={stat.label} className="p-4 space-y-1">
+                <p className="text-[10px] uppercase tracking-wider font-bold text-slate-500 dark:text-slate-400">{stat.label}</p>
+                <p className="text-2xl font-black text-slate-600 dark:text-slate-300">
+                  {stat.value === undefined || stat.value === null ? '—' : `${stat.value}${stat.suffix}`}
+                </p>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400">{stat.note}</p>
+              </Card>
+            ))}
+          </div>
 
-      {/* Tab Contents */}
-      {knowledge ? (
-        <div className="space-y-6">
-          {/* TAB 1: Technical Architecture Diagram */}
-          {activeTab === 'architecture' && (
-            <div className="space-y-6">
-              <Card className="p-6 space-y-4">
-                <div className="flex items-center justify-between border-b border-ivory-dark pb-3">
-                  <div>
-                    <h3 className="text-sm font-bold text-charcoal">System Architectural Topology</h3>
-                    <p className="text-xs text-charcoal-light">
-                      {knowledge.technicalArchitecture?.overview || 'Multi-tier service topology with event streaming and storage isolation.'}
-                    </p>
+          <div role="tablist" aria-label="Reconstructed project information" className="flex gap-1 overflow-x-auto border-b border-slate-200 dark:border-white/10 pb-px scrollbar-thin">
+            {TABS.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`inline-flex items-center gap-2 whitespace-nowrap px-3 py-3 text-xs font-bold border-b-2 transition-all duration-200 ${
+                    activeTab === tab.id
+                      ? 'border-[#525354] text-slate-900 dark:text-slate-100 bg-slate-100/70 dark:bg-white/5'
+                      : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:bg-white/5'
+                  }`}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="space-y-5 min-w-0">
+            {activeTab === 'architecture' && (
+              <Card className="p-5 sm:p-6 space-y-5">
+                <SectionHeading title="Technical Architecture" count={components.length} />
+                {architecture.overview || architecture.pattern ? (
+                  <div className="rounded-xl bg-slate-100 dark:bg-[#242729] border border-slate-200 dark:border-white/10 p-4 space-y-2">
+                    {architecture.pattern && <Badge variant="sage">{architecture.pattern}</Badge>}
+                    <p className="text-sm text-slate-900 dark:text-slate-100 leading-relaxed">{architecture.overview}</p>
+                    <CitationButton citation={architecture.sources?.[0]} />
                   </div>
-                  <Badge variant="sage">{knowledge.technicalArchitecture?.pattern || 'Layered Architecture'}</Badge>
-                </div>
-
-                {/* Architecture Visual Topology Flow */}
-                <div className="bg-ivory rounded-xl border border-sage/30 p-6 space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
-                    {/* Layer 1: Client */}
-                    <div className="p-4 rounded-xl bg-white border border-teal/40 shadow-soft text-center space-y-2">
-                      <div className="w-8 h-8 rounded-lg bg-mint text-teal flex items-center justify-center mx-auto">
-                        <Layers className="w-4 h-4" />
-                      </div>
-                      <div className="text-xs font-bold text-charcoal">Presentation Layer</div>
-                      <div className="text-[11px] font-mono text-teal">React.js + Tailwind</div>
-                      <p className="text-[10px] text-charcoal-light">High-density SaaS dashboards</p>
-                    </div>
-
-                    {/* Arrow 1 */}
-                    <div className="hidden md:flex flex-col items-center justify-center text-charcoal-light text-[10px] font-mono">
-                      <span>HTTPS / JWT</span>
-                      <ArrowRight className="w-5 h-5 text-teal" />
-                    </div>
-
-                    {/* Layer 2: API Gateway & Application */}
-                    <div className="p-4 rounded-xl bg-white border border-teal/40 shadow-soft text-center space-y-2">
-                      <div className="w-8 h-8 rounded-lg bg-mint text-teal flex items-center justify-center mx-auto">
-                        <Server className="w-4 h-4" />
-                      </div>
-                      <div className="text-xs font-bold text-charcoal">API & Application Tier</div>
-                      <div className="text-[11px] font-mono text-teal">Node.js Express REST</div>
-                      <p className="text-[10px] text-charcoal-light">Ingestion & Auth Services</p>
-                    </div>
-
-                    {/* Arrow 2 */}
-                    <div className="hidden md:flex flex-col items-center justify-center text-charcoal-light text-[10px] font-mono">
-                      <span>Persistence</span>
-                      <ArrowRight className="w-5 h-5 text-teal" />
-                    </div>
-                  </div>
-
-                  {/* Layer 3: Persistence Stores */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-sage/20">
-                    <div className="p-4 rounded-xl bg-white border border-sage/30 space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-charcoal">Primary Data Store</span>
-                        <Badge variant="teal">Document Store</Badge>
-                      </div>
-                      <div className="text-xs text-charcoal font-medium">MongoDB (with Mongoose ODM)</div>
-                      <p className="text-[11px] text-charcoal-light leading-snug">
-                        Stores ingested project documents, line-level sections, and audit trails.
-                      </p>
-                    </div>
-
-                    <div className="p-4 rounded-xl bg-white border border-sage/30 space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-charcoal">AI Intelligence Layer</span>
-                        <Badge variant="aqua">LLM + Heuristics</Badge>
-                      </div>
-                      <div className="text-xs text-charcoal font-medium">Google Gemini + Citation Mapper</div>
-                      <p className="text-[11px] text-charcoal-light leading-snug">
-                        Validates claims, detects contradictions, and assigns source citations.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Components list */}
-                <div className="space-y-3 pt-2">
-                  <div className="text-xs font-bold uppercase tracking-wider text-charcoal-light">
-                    Extracted Architectural Components
-                  </div>
-                  <div className="space-y-2">
-                    {knowledge.technicalArchitecture?.components?.map((c, idx) => (
-                      <div key={idx} className="p-3.5 rounded-lg border border-sage/20 bg-ivory flex items-center justify-between text-xs">
-                        <div className="space-y-1">
-                          <div className="font-bold text-charcoal">{c.name}</div>
-                          <p className="text-charcoal-light text-[11px]">{c.role}</p>
-                          <div className="flex gap-1.5 pt-1">
-                            {c.technologies?.map((tech, tIdx) => (
-                              <span key={tIdx} className="font-mono text-[10px] px-2 py-0.5 rounded bg-white border border-sage/30 text-teal">
-                                {tech}
-                              </span>
+                ) : (
+                  <EmptyState compact title="Architecture summary not verified" />
+                )}
+                {components.length ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {components.map((component, index) => (
+                      <Card key={component._id || component.name || index} className="p-4 space-y-2">
+                        <div className="flex items-start justify-between gap-2">
+                          <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">{valueOr(component.name, 'Unnamed component')}</h4>
+                          <StatusBadge status={component.status} />
+                        </div>
+                        <p className="text-xs text-slate-600 dark:text-slate-300">{valueOr(component.role, 'Role not specified')}</p>
+                        {asArray(component.technologies).length > 0 && (
+                          <div className="flex flex-wrap gap-1.5">
+                            {component.technologies.map((technology, i) => (
+                              <span key={`${technology}-${i}`} className="rounded-md border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-[#242729] px-2 py-1 text-[10px] font-mono">{technology}</span>
                             ))}
                           </div>
-                        </div>
-                        {c.sources?.[0] && (
-                          <button
-                            onClick={() => setCitationModal({ open: true, citation: c.sources[0] })}
-                            className="text-[11px] font-bold text-teal hover:underline flex items-center gap-1 shrink-0 ml-4"
-                          >
-                            <FileText className="w-3.5 h-3.5" /> Citation
-                          </button>
                         )}
-                      </div>
+                        <CitationButton citation={component.sources?.[0]} />
+                      </Card>
                     ))}
                   </div>
-                </div>
+                ) : (
+                  <EmptyState compact title="No verified architecture components" />
+                )}
+                {(asArray(architecture.diagramNodes).length > 0 || asArray(architecture.diagramEdges).length > 0) && (
+                  <div className="space-y-3">
+                    <SectionHeading title="Extracted Diagram Structure" />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div className="rounded-lg border border-slate-200 dark:border-white/10 p-3">
+                        <p className="text-xs font-bold mb-2">Nodes</p>
+                        {asArray(architecture.diagramNodes).map((node, i) => (
+                          <p key={i} className="text-xs text-slate-600 dark:text-slate-300 py-1">{typeof node === 'string' ? node : valueOr(node.label || node.name || node.id, 'Unnamed node')}</p>
+                        ))}
+                      </div>
+                      <div className="rounded-lg border border-slate-200 dark:border-white/10 p-3">
+                        <p className="text-xs font-bold mb-2">Connections</p>
+                        {asArray(architecture.diagramEdges).map((edge, i) => (
+                          <p key={i} className="text-xs text-slate-600 dark:text-slate-300 py-1">
+                            {typeof edge === 'string' ? edge : `${valueOr(edge.from || edge.source, '?')} → ${valueOr(edge.to || edge.target, '?')}`}
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </Card>
-            </div>
-          )}
+            )}
 
-          {/* TAB 2: Objectives & Strategic Overview */}
-          {activeTab === 'objectives' && (
-            <Card className="p-6 space-y-5">
-              <div className="space-y-2 border-b border-ivory-dark pb-4">
-                <h3 className="text-sm font-bold text-charcoal">Strategic Problem Statement</h3>
-                <p className="text-xs text-charcoal leading-relaxed">
-                  {knowledge.overview?.problemStatement || 'Departing contributors leave fragmented notes and unrecorded decisions, stalling incoming engineers.'}
-                </p>
-              </div>
-
-              <div className="space-y-3">
-                <div className="text-xs font-bold uppercase tracking-wider text-charcoal-light">
-                  Extracted Project Objectives ({knowledge.objectives?.length || 0})
-                </div>
-                <div className="space-y-3">
-                  {knowledge.objectives?.map((obj) => (
-                    <div key={obj.id} className="p-4 rounded-xl border border-sage/20 bg-ivory space-y-2 text-xs">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-charcoal text-sm">{obj.title}</span>
-                          {getStatusBadge(obj.status)}
-                        </div>
-                        {obj.sources?.[0] && (
-                          <button
-                            onClick={() => setCitationModal({ open: true, citation: obj.sources[0] })}
-                            className="text-[11px] font-bold text-teal hover:underline flex items-center gap-1"
-                          >
-                            <FileText className="w-3.5 h-3.5" /> Source Citation
-                          </button>
-                        )}
-                      </div>
-                      <p className="text-charcoal-light leading-relaxed">{obj.description}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </Card>
-          )}
-
-          {/* TAB 3: Technology Stack */}
-          {activeTab === 'techstack' && (
-            <Card className="p-6 space-y-4">
-              <div className="flex items-center justify-between border-b border-ivory-dark pb-3">
-                <h3 className="text-sm font-bold text-charcoal">Technology Stack & Version Catalog</h3>
-                <Badge variant="teal">Extracted from Specs</Badge>
-              </div>
-
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead>
-                    <tr className="border-b border-sage/20 text-charcoal-light uppercase tracking-wider text-[10px]">
-                      <th className="py-2.5 px-3">Category</th>
-                      <th className="py-2.5 px-3">Technology</th>
-                      <th className="py-2.5 px-3">Version</th>
-                      <th className="py-2.5 px-3">Verification</th>
-                      <th className="py-2.5 px-3 text-right">Citation</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-sage/10">
-                    {knowledge.technologyStack?.map((t, idx) => (
-                      <tr key={idx} className="hover:bg-ivory/80">
-                        <td className="py-3 px-3 font-semibold text-charcoal">{t.category}</td>
-                        <td className="py-3 px-3 font-mono font-bold text-teal">{t.technology}</td>
-                        <td className="py-3 px-3 font-mono text-charcoal-light">{t.version || 'Latest'}</td>
-                        <td className="py-3 px-3">{getStatusBadge(t.status)}</td>
-                        <td className="py-3 px-3 text-right">
-                          {t.sources?.[0] && (
-                            <button
-                              onClick={() => setCitationModal({ open: true, citation: t.sources[0] })}
-                              className="text-teal hover:underline font-bold text-[11px] inline-flex items-center gap-1"
-                            >
-                              <FileText className="w-3.5 h-3.5" /> View Excerpt
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </Card>
-          )}
-
-          {/* TAB 4: Decisions & Rationale */}
-          {activeTab === 'decisions' && (
-            <div className="space-y-4">
-              {knowledge.decisions?.map((d, idx) => (
-                <Card key={idx} className="p-5 space-y-3">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-sm text-charcoal">{d.decision}</span>
-                        {getStatusBadge(d.status)}
-                      </div>
-                      <div className="text-[11px] text-charcoal-light">
-                        Decided by <strong className="text-teal">{d.decidedBy || 'Lead Architect'}</strong> • Date: {d.date || 'Sprint Record'}
-                      </div>
-                    </div>
-                    {d.sources?.[0] && (
-                      <button
-                        onClick={() => setCitationModal({ open: true, citation: d.sources[0] })}
-                        className="text-[11px] font-bold text-teal hover:underline flex items-center gap-1 shrink-0"
-                      >
-                        <FileText className="w-3.5 h-3.5" /> Citation
-                      </button>
-                    )}
+            {activeTab === 'overview' && (
+              <div className="space-y-4">
+                <Card className="p-5 sm:p-6 space-y-4">
+                  <SectionHeading title="Project Overview" />
+                  <div>
+                    <p className="text-[10px] uppercase tracking-wider font-bold text-slate-500 dark:text-slate-400 mb-1">Summary</p>
+                    <p className="text-sm text-slate-900 dark:text-slate-100 leading-relaxed">{valueOr(knowledge.overview?.summary)}</p>
                   </div>
-
-                  <div className="p-3.5 rounded-lg bg-ivory border border-sage/20 space-y-1 text-xs">
-                    <div className="font-bold text-charcoal">Decision Rationale:</div>
-                    <p className="text-charcoal-light leading-relaxed">{d.rationale}</p>
+                  <div>
+                    <p className="text-[10px] uppercase tracking-wider font-bold text-slate-500 dark:text-slate-400 mb-1">Problem Statement</p>
+                    <p className="text-sm text-slate-900 dark:text-slate-100 leading-relaxed">{valueOr(knowledge.overview?.problemStatement)}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] uppercase tracking-wider font-bold text-slate-500 dark:text-slate-400 mb-1">Target Audience</p>
+                    <p className="text-sm text-slate-900 dark:text-slate-100 leading-relaxed">{valueOr(knowledge.overview?.targetAudience)}</p>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <StatusBadge status={knowledge.overview?.status} />
+                    <CitationButton citation={knowledge.overview?.sources?.[0]} />
                   </div>
                 </Card>
-              ))}
-            </div>
-          )}
-
-          {/* TAB 5: Tasks & Deliverables */}
-          {activeTab === 'tasks' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Completed Tasks */}
-              <Card className="p-5 space-y-4">
-                <div className="flex items-center justify-between border-b border-ivory-dark pb-3">
-                  <div className="flex items-center gap-2 text-teal font-bold text-sm">
-                    <CheckCircle2 className="w-4 h-4" />
-                    <span>Completed Tasks ({knowledge.completedTasks?.length || 0})</span>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  {knowledge.completedTasks?.map((task) => (
-                    <div key={task.id} className="p-3.5 rounded-lg border border-sage/20 bg-ivory space-y-1.5 text-xs">
-                      <div className="flex items-center justify-between">
-                        <span className="font-bold text-charcoal">{task.title}</span>
-                        <Badge variant="teal">Done</Badge>
-                      </div>
-                      <p className="text-charcoal-light text-[11px]">{task.description}</p>
-                      <div className="flex justify-between items-center text-[10px] text-teal pt-1">
-                        <span>Owner: {task.owner || 'Verified'}</span>
-                        {task.sources?.[0] && (
-                          <button
-                            onClick={() => setCitationModal({ open: true, citation: task.sources[0] })}
-                            className="hover:underline font-bold"
-                          >
-                            View Evidence
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-
-              {/* Pending Tasks */}
-              <Card className="p-5 space-y-4">
-                <div className="flex items-center justify-between border-b border-ivory-dark pb-3">
-                  <div className="flex items-center gap-2 text-coral-dark font-bold text-sm">
-                    <Clock className="w-4 h-4" />
-                    <span>Pending Tasks ({knowledge.pendingTasks?.length || 0})</span>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  {knowledge.pendingTasks?.map((task) => (
-                    <div key={task.id} className="p-3.5 rounded-lg border border-coral/30 bg-rose-50/20 space-y-1.5 text-xs">
-                      <div className="flex items-center justify-between">
-                        <span className="font-bold text-charcoal">{task.title}</span>
-                        <Badge variant="coral">Pending</Badge>
-                      </div>
-                      <p className="text-charcoal-light text-[11px]">{task.description}</p>
-                      <div className="flex justify-between items-center text-[10px] pt-1">
-                        <span className="text-coral-dark font-bold">Owner: {task.owner || 'Unassigned (TBD)'}</span>
-                        {task.sources?.[0] && (
-                          <button
-                            onClick={() => setCitationModal({ open: true, citation: task.sources[0] })}
-                            className="text-teal hover:underline font-bold"
-                          >
-                            View Evidence
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            </div>
-          )}
-
-          {/* TAB 6: Team Responsibilities */}
-          {activeTab === 'team' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {knowledge.teamResponsibilities?.map((member, idx) => (
-                <Card key={idx} className="p-5 space-y-3 text-xs">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-bold text-sm text-charcoal">{member.name}</h4>
-                      <div className="text-[11px] text-teal font-semibold">{member.role}</div>
-                    </div>
-                    {getStatusBadge(member.status)}
-                  </div>
-
-                  <div className="space-y-1">
-                    <div className="font-bold text-charcoal uppercase tracking-wider text-[10px]">
-                      Ownership Areas
-                    </div>
-                    <div className="flex flex-wrap gap-1.5">
-                      {member.ownershipAreas?.map((area, aIdx) => (
-                        <span key={aIdx} className="px-2 py-0.5 rounded bg-ivory border border-sage/30 text-charcoal font-medium text-[11px]">
-                          {area}
-                        </span>
+                <Card className="p-5 sm:p-6 space-y-4">
+                  <SectionHeading title="Project Objectives" count={objectives.length} />
+                  {objectives.length ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {objectives.map((objective, index) => renderFactCard(
+                        objective,
+                        objective.title,
+                        objective.description,
+                        objective.category,
+                        objective._id || index
                       ))}
                     </div>
-                  </div>
+                  ) : <EmptyState compact title="No verified objectives" />}
                 </Card>
-              ))}
-            </div>
-          )}
+              </div>
+            )}
 
-          {/* TAB 7: Dependencies & Risks */}
-          {activeTab === 'risks' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Dependencies */}
-              <Card className="p-5 space-y-4">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-charcoal-light">
-                  System Dependencies ({knowledge.dependencies?.length || 0})
-                </h3>
-                <div className="space-y-3">
-                  {knowledge.dependencies?.map((dep, idx) => (
-                    <div key={idx} className="p-3.5 rounded-lg border border-sage/20 bg-ivory space-y-1 text-xs">
-                      <div className="flex items-center justify-between">
-                        <span className="font-bold text-charcoal">{dep.item}</span>
-                        <Badge variant="teal">{dep.status}</Badge>
-                      </div>
-                      <div className="text-[11px] text-charcoal-light">
-                        Depends on: <strong className="text-teal">{dep.dependsOn}</strong>
-                      </div>
-                      <p className="text-[11px] text-charcoal-light pt-1">{dep.impact}</p>
-                    </div>
-                  ))}
-                </div>
+            {activeTab === 'techstack' && (
+              <Card className="p-5 sm:p-6 space-y-4">
+                <SectionHeading title="Technology Stack" count={technologyStack.length} />
+                {technologyStack.length ? (
+                  <div className="overflow-x-auto">
+                    <table className="w-full min-w-[560px] text-left text-xs">
+                      <thead>
+                        <tr className="border-b border-slate-200 dark:border-white/10 text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                          <th className="p-3">Category</th>
+                          <th className="p-3">Technology</th>
+                          <th className="p-3">Version</th>
+                          <th className="p-3">Status</th>
+                          <th className="p-3 text-right">Evidence</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#B7C5CC]">
+                        {technologyStack.map((item, index) => (
+                          <tr key={item._id || item.technology || index} className="hover:bg-slate-100/60 dark:bg-white/5">
+                            <td className="p-3">{valueOr(item.category, '—')}</td>
+                            <td className="p-3 font-bold font-mono">{valueOr(item.technology, '—')}</td>
+                            <td className="p-3">{valueOr(item.version, 'Not specified')}</td>
+                            <td className="p-3"><StatusBadge status={item.status} /></td>
+                            <td className="p-3 text-right"><CitationButton citation={item.sources?.[0]} label="View" /></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : <EmptyState compact title="No verified technologies" />}
               </Card>
+            )}
 
-              {/* Risks */}
-              <Card className="p-5 space-y-4">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-charcoal-light">
-                  Identified Operational Risks ({knowledge.risks?.length || 0})
-                </h3>
-                <div className="space-y-3">
-                  {knowledge.risks?.map((risk, idx) => (
-                    <div key={idx} className="p-3.5 rounded-lg border border-coral/30 bg-rose-50/20 space-y-1.5 text-xs">
-                      <div className="flex items-center justify-between">
-                        <span className="font-bold text-charcoal">{risk.title}</span>
-                        <Badge variant="coral">Impact: {risk.impact}</Badge>
-                      </div>
-                      <p className="text-charcoal-light text-[11px]">{risk.description}</p>
-                      <div className="p-2 rounded bg-white border border-sage/20 text-[11px] text-teal">
-                        <strong>Mitigation:</strong> {risk.mitigation}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+            {activeTab === 'decisions' && (
+              <div className="space-y-3">
+                {decisions.length ? decisions.map((decision, index) => renderFactCard(
+                  decision,
+                  decision.decision,
+                  decision.rationale,
+                  [decision.decidedBy, decision.date].filter(Boolean).join(' • '),
+                  decision._id || index
+                )) : <EmptyState title="No verified technical decisions" />}
+              </div>
+            )}
+
+            {activeTab === 'tasks' && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {[
+                  { title: 'Completed Tasks', items: completedTasks, icon: CheckCircle2, empty: 'No completed tasks were verified.' },
+                  { title: 'Pending Tasks', items: pendingTasks, icon: Clock, empty: 'No pending tasks were verified.' },
+                ].map((group) => {
+                  const Icon = group.icon;
+                  return (
+                    <Card key={group.title} className="p-5 space-y-4">
+                      <SectionHeading title={group.title} count={group.items.length}>
+                        <Icon className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+                      </SectionHeading>
+                      {group.items.length ? (
+                        <div className="space-y-3">
+                          {group.items.map((task, index) => (
+                            <div key={task._id || index} className="rounded-lg border border-slate-200 dark:border-white/10 bg-slate-100/60 dark:bg-white/5 p-3 space-y-2">
+                              <div className="flex flex-wrap items-center justify-between gap-2">
+                                <p className="text-xs font-bold text-slate-900 dark:text-slate-100">{valueOr(task.title, 'Untitled task')}</p>
+                                <StatusBadge status={task.status} />
+                              </div>
+                              <p className="text-xs text-slate-600 dark:text-slate-300">{valueOr(task.description, '')}</p>
+                              <div className="flex flex-wrap justify-between gap-2 text-[10px] text-slate-500 dark:text-slate-400">
+                                <span>Owner: {valueOr(task.owner, 'Not specified')}</span>
+                                <CitationButton citation={task.sources?.[0]} label="Evidence" />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : <EmptyState compact detail={group.empty} />}
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
+
+            {activeTab === 'team' && (
+              <Card className="p-5 sm:p-6 space-y-4">
+                <SectionHeading title="Team Responsibilities & Ownership" count={team.length} />
+                {team.length ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {team.map((member, index) => (
+                      <Card key={member._id || member.name || index} className="p-4 space-y-3 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">{valueOr(member.name, 'Unnamed member')}</h4>
+                            <p className="text-xs text-slate-600 dark:text-slate-300">{valueOr(member.role, 'Role not specified')}</p>
+                          </div>
+                          <StatusBadge status={member.status} />
+                        </div>
+                        {member.responsibilities && (
+                          <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">{member.responsibilities}</p>
+                        )}
+                        <div>
+                          <p className="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">Ownership Areas</p>
+                          {asArray(member.ownershipAreas).length ? (
+                            <div className="flex flex-wrap gap-1.5">
+                              {member.ownershipAreas.map((area, i) => <Badge key={`${area}-${i}`} variant="sage">{area}</Badge>)}
+                            </div>
+                          ) : <p className="text-xs text-slate-500 dark:text-slate-400">Not specified</p>}
+                        </div>
+                        <CitationButton citation={member.sources?.[0]} />
+                      </Card>
+                    ))}
+                  </div>
+                ) : <EmptyState compact title="No verified team ownership information" />}
               </Card>
-            </div>
-          )}
-        </div>
-      ) : (
-        <Card className="p-12 text-center space-y-4">
-          <Cpu className="w-12 h-12 text-sage mx-auto" />
-          <h3 className="text-base font-bold text-charcoal">No Reconstructed Knowledge Yet</h3>
-          <p className="text-xs text-charcoal-light max-w-sm mx-auto">
-            Click the button below to initiate the AI Reconstruction Pipeline on your ingested documents.
-          </p>
-          <Button
-            variant="primary"
-            size="md"
-            icon={Sparkles}
-            onClick={handleRunReconstruction}
-            loading={reconstructing}
-          >
-            Run Reconstruction Pipeline
-          </Button>
-        </Card>
+            )}
+
+            {activeTab === 'risks' && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <Card className="p-5 space-y-4">
+                  <SectionHeading title="Dependencies" count={dependencies.length} />
+                  {dependencies.length ? dependencies.map((dependency, index) => (
+                    <div key={dependency._id || index} className="rounded-lg border border-slate-200 dark:border-white/10 p-3 space-y-2">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <p className="text-xs font-bold">{valueOr(dependency.item, 'Unnamed dependency')}</p>
+                        <StatusBadge status={dependency.status} />
+                      </div>
+                      <p className="text-xs text-slate-600 dark:text-slate-300">Depends on: {valueOr(dependency.dependsOn)}</p>
+                      {dependency.impact && <p className="text-xs text-slate-600 dark:text-slate-300">{dependency.impact}</p>}
+                      <CitationButton citation={dependency.sources?.[0]} />
+                    </div>
+                  )) : <EmptyState compact title="No verified dependencies" />}
+                </Card>
+                <Card className="p-5 space-y-4">
+                  <SectionHeading title="Operational Risks" count={risks.length} />
+                  {risks.length ? risks.map((risk, index) => (
+                    <div key={risk._id || index} className="rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 p-3 space-y-2">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <p className="text-xs font-bold">{valueOr(risk.title, 'Unnamed risk')}</p>
+                        {risk.impact && <Badge variant="sage">Impact: {risk.impact}</Badge>}
+                      </div>
+                      <p className="text-xs text-slate-600 dark:text-slate-300">{valueOr(risk.description, '')}</p>
+                      {risk.mitigation && <p className="text-xs text-slate-600 dark:text-slate-300"><strong>Mitigation:</strong> {risk.mitigation}</p>}
+                      <CitationButton citation={risk.sources?.[0]} />
+                    </div>
+                  )) : <EmptyState compact title="No verified risks" />}
+                </Card>
+              </div>
+            )}
+
+            {activeTab === 'milestones' && (
+              <Card className="p-5 sm:p-6 space-y-4">
+                <SectionHeading title="Project Milestones" count={milestones.length} />
+                {milestones.length ? (
+                  <div className="space-y-3">
+                    {milestones.map((milestone, index) => (
+                      <div key={milestone._id || index} className="flex gap-3 rounded-lg border border-slate-200 dark:border-white/10 p-4">
+                        <div className="mt-0.5 rounded-full bg-slate-100 dark:bg-[#242729] p-2 h-fit"><CalendarDays className="w-4 h-4 text-slate-600 dark:text-slate-300" /></div>
+                        <div className="min-w-0 flex-1 space-y-2">
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <p className="text-sm font-bold text-slate-900 dark:text-slate-100">{valueOr(milestone.title, 'Untitled milestone')}</p>
+                            <StatusBadge status={milestone.status} />
+                          </div>
+                          <p className="text-xs text-slate-600 dark:text-slate-300">{valueOr(milestone.description, '')}</p>
+                          {(milestone.dueDate || milestone.date) && <p className="text-[11px] text-slate-500 dark:text-slate-400">Date: {milestone.dueDate || milestone.date}</p>}
+                          <CitationButton citation={milestone.sources?.[0]} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : <EmptyState compact title="No verified milestones" />}
+              </Card>
+            )}
+          </div>
+        </>
       )}
 
-      {/* Citation Inspector Modal */}
       <Modal
         isOpen={citationModal.open}
         onClose={() => setCitationModal({ open: false, citation: null })}
-        title="Document Source Citation"
+        title="Verified Document Citation"
         maxWidth="max-w-xl"
       >
         {citationModal.citation && (
           <div className="space-y-4 text-xs">
-            <div className="flex items-center justify-between p-3 rounded-lg bg-ivory border border-sage/30">
-              <div>
-                <div className="font-bold text-teal">{citationModal.citation.documentName}</div>
-                <div className="text-[11px] text-charcoal-light font-mono">
-                  Section: {citationModal.citation.sectionTitle || 'Main'} • Page {citationModal.citation.pageNumber || 1} • {citationModal.citation.lineRange || 'L1-L10'}
-                </div>
-              </div>
-              <Badge variant="teal">Verified Source</Badge>
+            <div className="rounded-lg border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-[#242729] p-3 space-y-1">
+              <p className="font-bold text-slate-900 dark:text-slate-100">{citationModal.citation.documentName || 'Source document'}</p>
+              <p className="text-[11px] text-slate-600 dark:text-slate-300 font-mono">
+                {citationModal.citation.sectionTitle || 'Main Body'} • Page {citationModal.citation.pageNumber || 1} • {citationModal.citation.lineRange || 'Line range unavailable'}
+              </p>
             </div>
-
-            <div className="space-y-1.5">
-              <div className="font-bold uppercase tracking-wider text-[10px] text-charcoal-light">
-                Document Excerpt
-              </div>
-              <blockquote className="p-4 rounded-lg bg-mint-light/40 border-l-4 border-teal text-charcoal italic leading-relaxed font-serif text-sm">
-                "{citationModal.citation.excerpt}"
+            <div>
+              <p className="text-[10px] uppercase tracking-wider font-bold text-slate-500 dark:text-slate-400 mb-2">Verified excerpt</p>
+              <blockquote className="rounded-lg border-l-4 border-[#737F85] bg-slate-100/60 dark:bg-white/5 p-4 text-sm italic leading-relaxed text-slate-900 dark:text-slate-100">
+                “{citationModal.citation.excerpt || 'No excerpt available.'}”
               </blockquote>
             </div>
-
-            <div className="flex justify-end pt-3 border-t border-ivory-dark">
-              <Button variant="outline" size="sm" onClick={() => setCitationModal({ open: false, citation: null })}>
-                Close Citation
-              </Button>
+            <div className="flex justify-end border-t border-slate-200 dark:border-white/10 pt-3">
+              <Button variant="outline" size="sm" onClick={() => setCitationModal({ open: false, citation: null })}>Close</Button>
             </div>
           </div>
         )}
@@ -672,3 +644,5 @@ const ReconstructionPage = () => {
 };
 
 export default ReconstructionPage;
+
+

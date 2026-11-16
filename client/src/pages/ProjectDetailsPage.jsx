@@ -12,6 +12,7 @@ import {
   Sparkles,
   CheckCircle2,
   Edit3,
+  Bot,
 } from 'lucide-react';
 import api from '../services/api';
 import { useProject } from '../context/ProjectContext';
@@ -63,7 +64,7 @@ const ProjectDetailsPage = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="text-xs font-mono text-teal animate-pulse">Loading Project Details...</div>
+        <div className="text-xs font-mono text-[#525354] animate-pulse">Loading Project Details...</div>
       </div>
     );
   }
@@ -71,7 +72,7 @@ const ProjectDetailsPage = () => {
   if (!project) {
     return (
       <Card className="p-8 text-center space-y-3">
-        <h2 className="text-lg font-bold text-charcoal">Project Not Found</h2>
+        <h2 className="text-lg font-bold text-[#181818]">Project Not Found</h2>
         <Link to="/app/projects">
           <Button variant="primary" size="sm">Back to Projects</Button>
         </Link>
@@ -82,21 +83,26 @@ const ProjectDetailsPage = () => {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Header Meta */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-sage/30 pb-5">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#B7C5CC] pb-5">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-sage/30 text-charcoal">
+            <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-[#B7C5CC] text-[#181818]">
               {project.key}
             </span>
-            <h1 className="text-2xl font-black text-charcoal">{project.name}</h1>
-            <Badge variant="teal">{project.status}</Badge>
+            <h1 className="text-2xl font-black text-[#181818]">{project.name}</h1>
+            <Badge variant="aqua">{project.status}</Badge>
           </div>
-          <p className="text-xs text-charcoal-light">
-            Category: {project.category} • Target Domain: {project.targetDomain}
+          <p className="text-xs text-[#737F85]">
+            Category: {project.category} Ã¢â‚¬Â¢ Target Domain: {project.targetDomain}
           </p>
         </div>
 
         <div className="flex items-center gap-3">
+          <Link to={`/app/projects/${id}/companion`}>
+            <Button variant="primary" size="sm" icon={Bot}>
+              AI Companion
+            </Button>
+          </Link>
           <Link to="/app/documents">
             <Button variant="outline" size="sm" icon={FileText}>
               Document Center
@@ -116,41 +122,41 @@ const ProjectDetailsPage = () => {
         <div className="space-y-6 lg:col-span-2">
           {/* Overview */}
           <Card className="p-6 space-y-4">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-charcoal-light">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[#737F85]">
               Project Overview & Continuity Mission
             </h3>
-            <p className="text-sm text-charcoal leading-relaxed">
+            <p className="text-sm text-[#181818] leading-relaxed">
               {project.description || 'No overview recorded. Ingest documents to extract objectives and background.'}
             </p>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-sage/20 text-center text-xs">
-              <div className="p-2.5 rounded-lg bg-ivory">
-                <div className="text-charcoal-light">Documents</div>
-                <div className="text-lg font-bold text-charcoal">{documents.length}</div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-[#B7C5CC] text-center text-xs">
+              <div className="p-2.5 rounded-lg bg-[#DEE5E8]">
+                <div className="text-[#737F85]">Documents</div>
+                <div className="text-lg font-bold text-[#181818]">{documents.length}</div>
               </div>
-              <div className="p-2.5 rounded-lg bg-ivory">
-                <div className="text-charcoal-light">Open Gaps</div>
-                <div className="text-lg font-bold text-coral-dark">{project.stats?.openGaps || 0}</div>
+              <div className="p-2.5 rounded-lg bg-[#DEE5E8]">
+                <div className="text-[#737F85]">Open Gaps</div>
+                <div className="text-lg font-bold text-[#737F85]">{project.stats?.openGaps || 0}</div>
               </div>
-              <div className="p-2.5 rounded-lg bg-ivory">
-                <div className="text-charcoal-light">Conflicts</div>
-                <div className="text-lg font-bold text-gold-dark">{project.stats?.unresolvedConflicts || 0}</div>
+              <div className="p-2.5 rounded-lg bg-[#DEE5E8]">
+                <div className="text-[#737F85]">Conflicts</div>
+                <div className="text-lg font-bold text-[#525354]">{project.stats?.unresolvedConflicts || 0}</div>
               </div>
-              <div className="p-2.5 rounded-lg bg-ivory">
-                <div className="text-charcoal-light">Health Index</div>
-                <div className="text-lg font-bold text-teal">{project.healthScore || 0}%</div>
+              <div className="p-2.5 rounded-lg bg-[#DEE5E8]">
+                <div className="text-[#737F85]">Health Index</div>
+                <div className="text-lg font-bold text-[#525354]">{project.healthScore || 0}%</div>
               </div>
             </div>
           </Card>
 
           {/* Ingested Documents */}
           <Card className="p-6 space-y-4">
-            <div className="flex items-center justify-between border-b border-ivory-dark pb-3">
+            <div className="flex items-center justify-between border-b border-[#B7C5CC] pb-3">
               <div className="flex items-center gap-2">
-                <FileText className="w-4 h-4 text-teal" />
-                <h3 className="text-sm font-bold text-charcoal">Ingested Project Records</h3>
+                <FileText className="w-4 h-4 text-[#525354]" />
+                <h3 className="text-sm font-bold text-[#181818]">Ingested Project Records</h3>
               </div>
-              <Link to="/app/documents" className="text-xs font-bold text-teal hover:underline">
+              <Link to="/app/documents" className="text-xs font-bold text-[#525354] hover:underline">
                 Manage Documents
               </Link>
             </div>
@@ -158,23 +164,23 @@ const ProjectDetailsPage = () => {
             {documents.length > 0 ? (
               <div className="space-y-2">
                 {documents.map((doc) => (
-                  <div key={doc._id} className="flex items-center justify-between p-3 rounded-lg bg-ivory border border-sage/20 text-xs">
+                  <div key={doc._id} className="flex items-center justify-between p-3 rounded-lg bg-[#DEE5E8] border border-[#B7C5CC] text-xs">
                     <div className="flex items-center gap-3 truncate mr-2">
-                      <span className="font-mono uppercase font-bold text-[10px] px-1.5 py-0.5 rounded bg-sage/30 text-charcoal">
+                      <span className="font-mono uppercase font-bold text-[10px] px-1.5 py-0.5 rounded bg-[#B7C5CC] text-[#181818]">
                         {doc.fileType}
                       </span>
-                      <span className="font-semibold text-charcoal truncate">{doc.originalName}</span>
+                      <span className="font-semibold text-[#181818] truncate">{doc.originalName}</span>
                     </div>
-                    <div className="flex items-center gap-3 shrink-0 text-charcoal-light font-mono text-[11px]">
+                    <div className="flex items-center gap-3 shrink-0 text-[#737F85] font-mono text-[11px]">
                       <span>{doc.wordCount || 0} words</span>
                       <span>{doc.pageCount || 1} pgs</span>
-                      <Badge variant="teal">{doc.status}</Badge>
+                      <Badge variant="aqua">{doc.status}</Badge>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-6 text-xs text-charcoal-light space-y-2">
+              <div className="text-center py-6 text-xs text-[#737F85] space-y-2">
                 <p>No documents uploaded yet for this project.</p>
                 <Link to="/app/documents">
                   <Button variant="secondary" size="xs">Upload First Document</Button>
@@ -188,63 +194,74 @@ const ProjectDetailsPage = () => {
         <div className="space-y-6">
           {/* Health Index Card */}
           <Card className="p-6 space-y-4">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-charcoal-light">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[#737F85]">
               Knowledge Health Rating
             </h3>
             <HealthScoreBadge score={project.healthScore || 0} size="lg" showDetails />
-            <p className="text-xs text-charcoal-light leading-relaxed">
+            <p className="text-xs text-[#737F85] leading-relaxed">
               Based on the ratio of confirmed facts, open critical blind spots in the Gap Radar, and unresolved technical disputes.
             </p>
           </Card>
 
           {/* Quick Pillar Actions */}
           <Card className="p-6 space-y-3">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-charcoal-light">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[#737F85]">
               Continuity Modules
             </h3>
             <div className="space-y-2">
               <Link
-                to="/app/reconstruction"
-                className="flex items-center justify-between p-2.5 rounded-lg border border-sage/30 hover:bg-mint/40 transition-colors text-xs font-bold text-charcoal"
+                to={`/app/projects/${id}/companion`}
+                className="flex items-center justify-between rounded-lg border border-[#7FA99A] bg-[#E5F0EA] p-3 text-xs font-bold text-[#245C52] transition-all hover:bg-[#D5E8DD] hover:shadow-sm"
               >
                 <div className="flex items-center gap-2.5">
-                  <Cpu className="w-4 h-4 text-teal" />
+                  <Bot className="h-4 w-4" />
+                  <span>AI Project Companion</span>
+                </div>
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+
+              <Link
+                to="/app/reconstruction"
+                className="flex items-center justify-between p-2.5 rounded-lg border border-[#B7C5CC] hover:bg-[#B8C8D7]/40 transition-colors text-xs font-bold text-[#181818]"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Cpu className="w-4 h-4 text-[#525354]" />
                   <span>Reconstruction Engine</span>
                 </div>
-                <ArrowRight className="w-3.5 h-3.5 text-charcoal-light" />
+                <ArrowRight className="w-3.5 h-3.5 text-[#737F85]" />
               </Link>
 
               <Link
                 to="/app/gaps"
-                className="flex items-center justify-between p-2.5 rounded-lg border border-sage/30 hover:bg-rose-50/40 transition-colors text-xs font-bold text-charcoal"
+                className="flex items-center justify-between p-2.5 rounded-lg border border-[#B7C5CC] hover:bg-[#B7C5CC]/40 transition-colors text-xs font-bold text-[#181818]"
               >
                 <div className="flex items-center gap-2.5">
-                  <Radar className="w-4 h-4 text-coral-dark" />
+                  <Radar className="w-4 h-4 text-[#737F85]" />
                   <span>Knowledge Gap Radar</span>
                 </div>
-                <Badge variant="coral" size="xs">{project.stats?.openGaps || 0}</Badge>
+                <Badge variant="sage" size="xs">{project.stats?.openGaps || 0}</Badge>
               </Link>
 
               <Link
                 to="/app/conflicts"
-                className="flex items-center justify-between p-2.5 rounded-lg border border-sage/30 hover:bg-amber-50/40 transition-colors text-xs font-bold text-charcoal"
+                className="flex items-center justify-between p-2.5 rounded-lg border border-[#B7C5CC] hover:bg-[#B7C5CC]/40 transition-colors text-xs font-bold text-[#181818]"
               >
                 <div className="flex items-center gap-2.5">
-                  <GitCompare className="w-4 h-4 text-gold-dark" />
+                  <GitCompare className="w-4 h-4 text-[#525354]" />
                   <span>Conflict Workspace</span>
                 </div>
-                <Badge variant="gold" size="xs">{project.stats?.unresolvedConflicts || 0}</Badge>
+                <Badge variant="aqua" size="xs">{project.stats?.unresolvedConflicts || 0}</Badge>
               </Link>
 
               <Link
                 to="/app/handover"
-                className="flex items-center justify-between p-2.5 rounded-lg border border-sage/30 hover:bg-mint/40 transition-colors text-xs font-bold text-charcoal"
+                className="flex items-center justify-between p-2.5 rounded-lg border border-[#B7C5CC] hover:bg-[#B8C8D7]/40 transition-colors text-xs font-bold text-[#181818]"
               >
                 <div className="flex items-center gap-2.5">
-                  <FileCheck2 className="w-4 h-4 text-teal" />
+                  <FileCheck2 className="w-4 h-4 text-[#525354]" />
                   <span>Handover Dossier</span>
                 </div>
-                <ArrowRight className="w-3.5 h-3.5 text-charcoal-light" />
+                <ArrowRight className="w-3.5 h-3.5 text-[#737F85]" />
               </Link>
             </div>
           </Card>
@@ -255,3 +272,5 @@ const ProjectDetailsPage = () => {
 };
 
 export default ProjectDetailsPage;
+
+

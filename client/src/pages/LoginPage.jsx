@@ -43,11 +43,11 @@ const LoginPage = () => {
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md space-y-6">
         <div className="text-center space-y-2">
-          <div className="inline-flex w-12 h-12 rounded-xl bg-teal items-center justify-center text-ivory shadow-soft mb-2">
-            <BookOpen className="w-6 h-6 text-aqua" />
+          <div className="inline-flex w-12 h-12 rounded-xl bg-[#181818] items-center justify-center text-ivory shadow-soft mb-2">
+            <BookOpen className="w-6 h-6 text-[#B8C8D7]" />
           </div>
-          <h1 className="text-2xl font-bold text-charcoal">Sign In to THREADKEEP</h1>
-          <p className="text-xs text-charcoal-light">
+          <h1 className="text-2xl font-bold text-[#181818]">Sign In to THREADKEEP</h1>
+          <p className="text-xs text-[#737F85]">
             Reconnect and access your team's project memory repository.
           </p>
         </div>
@@ -55,7 +55,7 @@ const LoginPage = () => {
         <Card className="p-8 space-y-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-charcoal mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#181818] mb-1.5">
                 Work Email Address
               </label>
               <input
@@ -64,13 +64,13 @@ const LoginPage = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@company.com"
                 required
-                className="w-full px-3.5 py-2.5 rounded-lg border border-sage/40 bg-ivory text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
+                className="w-full px-3.5 py-2.5 rounded-lg border border-[#B7C5CC] bg-[#DEE5E8] text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#B8C8D7]/40 focus:border-[#737F85] transition-all"
               />
             </div>
 
             <div>
               <div className="flex justify-between items-center mb-1.5">
-                <label className="block text-xs font-bold uppercase tracking-wider text-charcoal">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#181818]">
                   Password
                 </label>
               </div>
@@ -78,9 +78,9 @@ const LoginPage = () => {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
+                placeholder="Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢"
                 required
-                className="w-full px-3.5 py-2.5 rounded-lg border border-sage/40 bg-ivory text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
+                className="w-full px-3.5 py-2.5 rounded-lg border border-[#B7C5CC] bg-[#DEE5E8] text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#B8C8D7]/40 focus:border-[#737F85] transition-all"
               />
             </div>
 
@@ -98,24 +98,24 @@ const LoginPage = () => {
           </form>
 
           {/* Quick Demo Credentials */}
-          <div className="pt-4 border-t border-sage/20">
+          <div className="pt-4 border-t border-[#B7C5CC]">
             <button
               type="button"
               onClick={handleDemoFill}
-              className="w-full flex items-center justify-center gap-2 p-2.5 rounded-lg border border-mint-dark/50 bg-mint text-teal text-xs font-bold hover:bg-mint-dark/70 transition-colors"
+              className="w-full flex items-center justify-center gap-2 p-2.5 rounded-lg border border-mint-dark/50 bg-[#B8C8D7] text-[#525354] text-xs font-bold hover:bg-[#B7C5CC] transition-colors"
             >
               <Sparkles className="w-4 h-4" />
               <span>Fill Demo Credentials (1-Click)</span>
             </button>
-            <div className="text-[11px] text-charcoal-light text-center mt-2 font-mono">
+            <div className="text-[11px] text-[#737F85] text-center mt-2 font-mono">
               Demo: architect@spy2o.io / threadkeep2026
             </div>
           </div>
         </Card>
 
-        <p className="text-center text-xs text-charcoal-light">
+        <p className="text-center text-xs text-[#737F85]">
           Don't have an account yet?{' '}
-          <Link to="/register" className="text-teal font-bold hover:underline">
+          <Link to="/register" className="text-[#525354] font-bold hover:underline">
             Register here
           </Link>
         </p>
@@ -125,3 +125,4 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+

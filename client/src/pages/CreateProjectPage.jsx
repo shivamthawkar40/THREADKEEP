@@ -59,9 +59,9 @@ const CreateProjectPage = () => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      <div className="border-b border-sage/30 pb-4">
-        <h1 className="text-2xl font-black text-charcoal">Create New Project Repository</h1>
-        <p className="text-xs text-charcoal-light mt-0.5">
+      <div className="border-b border-[#B7C5CC] pb-4">
+        <h1 className="text-2xl font-black text-[#181818]">Create New Project Repository</h1>
+        <p className="text-xs text-[#737F85] mt-0.5">
           Initialize a new project workspace for document ingestion and AI knowledge continuity.
         </p>
       </div>
@@ -71,7 +71,7 @@ const CreateProjectPage = () => {
         <Card className="p-6 md:col-span-2 space-y-5">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-charcoal mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#181818] mb-1.5">
                 Project Name *
               </label>
               <input
@@ -80,13 +80,13 @@ const CreateProjectPage = () => {
                 onChange={(e) => handleNameChange(e.target.value)}
                 placeholder="e.g. FinPulse: Core Banking Settlement"
                 required
-                className="w-full px-3.5 py-2.5 rounded-lg border border-sage/40 bg-ivory text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
+                className="w-full px-3.5 py-2.5 rounded-lg border border-[#B7C5CC] bg-[#DEE5E8] text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#B8C8D7]/40 focus:border-[#737F85] transition-all"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-charcoal mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#181818] mb-1.5">
                   Project Key (Prefix)
                 </label>
                 <input
@@ -95,18 +95,18 @@ const CreateProjectPage = () => {
                   onChange={(e) => setKey(e.target.value.toUpperCase())}
                   placeholder="e.g. FINP"
                   maxLength={6}
-                  className="w-full px-3 py-2 rounded-lg border border-sage/40 bg-ivory text-xs font-mono font-bold uppercase focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
+                  className="w-full px-3 py-2 rounded-lg border border-[#B7C5CC] bg-[#DEE5E8] text-xs font-mono font-bold uppercase focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#B8C8D7]/40 focus:border-[#737F85] transition-all"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-charcoal mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#181818] mb-1.5">
                   Category
                 </label>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-sage/40 bg-ivory text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
+                  className="w-full px-3 py-2 rounded-lg border border-[#B7C5CC] bg-[#DEE5E8] text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#B8C8D7]/40 focus:border-[#737F85] transition-all"
                 >
                   <option value="Software Engineering">Software Engineering</option>
                   <option value="Fintech & Banking">Fintech & Banking</option>
@@ -118,7 +118,7 @@ const CreateProjectPage = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-charcoal mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#181818] mb-1.5">
                 Target Domain
               </label>
               <input
@@ -126,12 +126,12 @@ const CreateProjectPage = () => {
                 value={targetDomain}
                 onChange={(e) => setTargetDomain(e.target.value)}
                 placeholder="e.g. High-Throughput Ledger Services"
-                className="w-full px-3.5 py-2 rounded-lg border border-sage/40 bg-ivory text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
+                className="w-full px-3.5 py-2 rounded-lg border border-[#B7C5CC] bg-[#DEE5E8] text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#B8C8D7]/40 focus:border-[#737F85] transition-all"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-charcoal mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#181818] mb-1.5">
                 Project Overview & Intent
               </label>
               <textarea
@@ -139,7 +139,7 @@ const CreateProjectPage = () => {
                 onChange={(e) => setDescription(e.target.value)}
                 rows={4}
                 placeholder="Briefly describe the project's background, target objectives, or departure context..."
-                className="w-full px-3.5 py-2 rounded-lg border border-sage/40 bg-ivory text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
+                className="w-full px-3.5 py-2 rounded-lg border border-[#B7C5CC] bg-[#DEE5E8] text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#B8C8D7]/40 focus:border-[#737F85] transition-all"
               />
             </div>
 
@@ -159,31 +159,31 @@ const CreateProjectPage = () => {
 
         {/* Live Preview Card */}
         <div className="space-y-4">
-          <div className="text-xs font-bold uppercase tracking-wider text-charcoal-light">
+          <div className="text-xs font-bold uppercase tracking-wider text-[#737F85]">
             Live Repository Preview
           </div>
-          <Card className="p-5 border-teal/40 bg-mint-light/40 space-y-4">
+          <Card className="p-5 border-[#B7C5CC] bg-[#B8C8D7]/40 space-y-4">
             <div className="flex items-center justify-between">
-              <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-teal text-ivory">
+              <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-[#181818] text-white">
                 {key || 'PROJ'}
               </span>
-              <Badge variant="teal">Draft</Badge>
+              <Badge variant="aqua">Draft</Badge>
             </div>
 
             <div>
-              <h3 className="font-bold text-base text-charcoal">
+              <h3 className="font-bold text-base text-[#181818]">
                 {name || 'Untitled Project Repository'}
               </h3>
-              <p className="text-xs text-charcoal-light mt-1">
+              <p className="text-xs text-[#737F85] mt-1">
                 Domain: {targetDomain || 'Enterprise Infrastructure'}
               </p>
             </div>
 
-            <p className="text-xs text-charcoal leading-relaxed line-clamp-3">
+            <p className="text-xs text-[#181818] leading-relaxed line-clamp-3">
               {description || 'Provide an overview to help incoming contributors understand the mission.'}
             </p>
 
-            <div className="pt-3 border-t border-sage/30 text-[11px] text-teal font-medium">
+            <div className="pt-3 border-t border-[#B7C5CC] text-[11px] text-[#525354] font-medium">
               Ready for Document Ingestion (PDF, DOCX, CSV, TXT)
             </div>
           </Card>
@@ -194,3 +194,5 @@ const CreateProjectPage = () => {
 };
 
 export default CreateProjectPage;
+
+

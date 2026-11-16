@@ -10,12 +10,69 @@ const csvParser = require('csv-parser');
  * @param {string} originalName
  * @returns {Promise<{rawText: string, wordCount: number, pageCount: number, sections: Array, fileType: string}>}
  */
+
+/**
+ * Basic content validation before document parsing.
+ */
+const validateDocumentContent = (filePath, ext) => {
+  const buffer = fs.readFileSync(filePath);
+
+  if (buffer.length === 0) {
+    throw new Error('Uploaded document is empty.');
+  }
+
+  if (ext === 'pdf') {
+    const header = buffer.subarray(0, Math.min(buffer.length, 1024)).toString('latin1');
+
+    if (!header.includes('%PDF-')) {
+      throw new Error('Invalid PDF file: PDF signature not found.');
+    }
+
+    return;
+  }
+
+  if (ext === 'docx') {
+    const isZip =
+      buffer.length >= 4 &&
+      buffer[0] === 0x50 &&
+      buffer[1] === 0x4b &&
+      buffer[2] === 0x03 &&
+      buffer[3] === 0x04;
+
+    if (!isZip) {
+      throw new Error('Invalid DOCX file: ZIP signature not found.');
+    }
+
+    return;
+  }
+
+  if (['csv', 'txt', 'md'].includes(ext)) {
+    if (buffer.includes(0)) {
+      throw new Error('Invalid text document: binary content detected.');
+    }
+
+    const content = buffer.toString('utf8');
+
+    if (content.includes('\uFFFD')) {
+      throw new Error('Invalid text encoding: unsupported or corrupted UTF-8 content.');
+    }
+  }
+};
+
 const parseDocument = async (filePath, originalName) => {
   const ext = path.extname(originalName).toLowerCase().replace('.', '');
   
   if (!fs.existsSync(filePath)) {
     throw new Error(`File not found: ${filePath}`);
   }
+
+  const allowedTypes = ['pdf', 'docx', 'csv', 'txt', 'md'];
+
+  if (!allowedTypes.includes(ext)) {
+    throw new Error('Unsupported document extension: ' + ext);
+  }
+
+  validateDocumentContent(filePath, ext);
 
   let rawText = '';
   let pageCount = 1;

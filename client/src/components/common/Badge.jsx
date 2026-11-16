@@ -1,16 +1,16 @@
-import React from 'react';
+﻿import React from 'react';
 
 const Badge = ({ children, variant = 'default', size = 'sm', className = '' }) => {
   const variants = {
-    default: 'bg-ivory-dark text-charcoal border border-sage/40',
-    teal:    'bg-teal/15 text-teal-dark border border-teal/25',
-    sage:    'bg-sage/20 text-charcoal-light border border-sage/40',
-    coral:   'bg-coral/15 text-coral-dark border border-coral/25',
-    gold:    'bg-gold/15 text-gold-dark border border-gold/25',
-    aqua:    'bg-aqua-dark/30 text-charcoal border border-sage/30',
-    success: 'bg-teal/15 text-teal-dark border border-teal/25',
-    warning: 'bg-gold/15 text-gold-dark border border-gold/25',
-    error:   'bg-coral/15 text-coral-dark border border-coral/25',
+    default: 'bg-slate-100 dark:bg-slate-700/60 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-white/10',
+    teal:    'bg-sky-100 dark:bg-sky-900/40 text-sky-900 dark:text-sky-200 border border-sky-200 dark:border-sky-800',
+    sage:    'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600',
+    coral:   'bg-slate-800 dark:bg-slate-600 text-white border border-slate-700 dark:border-slate-500',
+    gold:    'bg-amber-50 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-800',
+    aqua:    'bg-sky-100 dark:bg-sky-900/40 text-sky-900 dark:text-sky-200 border border-sky-200 dark:border-sky-800',
+    success: 'bg-sky-100 dark:bg-sky-900/40 text-sky-900 dark:text-sky-200 border border-sky-200 dark:border-sky-800',
+    warning: 'bg-amber-50 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-800',
+    error:   'bg-slate-800 dark:bg-slate-600 text-white border border-slate-700 dark:border-slate-500',
   };
 
   const sizes = {
@@ -34,3 +34,6 @@ const Badge = ({ children, variant = 'default', size = 'sm', className = '' }) =
 };
 
 export default Badge;
+
+
+

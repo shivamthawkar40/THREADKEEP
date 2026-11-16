@@ -91,6 +91,23 @@ const documentSchema = new mongoose.Schema({
     content: String,
   }],
 
+  isDeleted: {
+    type: Boolean,
+    default: false,
+    index: true,
+  },
+
+  deletedAt: {
+    type: Date,
+    default: null,
+  },
+
+  deletedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null,
+  },
+
   uploadedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

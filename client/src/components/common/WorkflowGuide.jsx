@@ -18,7 +18,7 @@ const steps = [
     label: 'Create Project',
     desc: 'Set up your project workspace',
     path: '/app/projects/create',
-    color: '#737653',
+    color: '#737F85',
   },
   {
     id: 2,
@@ -26,7 +26,7 @@ const steps = [
     label: 'Upload Documents',
     desc: 'PDF, DOCX, CSV, TXT files',
     path: '/app/documents',
-    color: '#737653',
+    color: '#737F85',
   },
   {
     id: 3,
@@ -34,7 +34,7 @@ const steps = [
     label: 'AI Reconstruction',
     desc: 'Extract knowledge & citations',
     path: '/app/reconstruction',
-    color: '#737653',
+    color: '#737F85',
   },
   {
     id: 4,
@@ -42,7 +42,7 @@ const steps = [
     label: 'Detect Gaps & Conflicts',
     desc: 'Find blind spots & contradictions',
     path: '/app/gaps',
-    color: '#C97645',
+    color: '#525354',
   },
   {
     id: 5,
@@ -50,7 +50,7 @@ const steps = [
     label: 'Human Review',
     desc: 'Approve or correct AI findings',
     path: '/app/reviews',
-    color: '#737653',
+    color: '#737F85',
   },
   {
     id: 6,
@@ -58,7 +58,7 @@ const steps = [
     label: 'Generate Handover',
     desc: 'Export executive PDF dossier',
     path: '/app/handover',
-    color: '#737653',
+    color: '#737F85',
   },
 ];
 
@@ -84,21 +84,21 @@ const WorkflowGuide = ({ currentStep = 0, compact = false, completedSteps = [] }
                 className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold
                   transition-all whitespace-nowrap border
                   ${isActive
-                    ? 'bg-teal text-ivory border-teal shadow-soft'
+                    ? 'bg-[#181818] text-white border-[#181818] shadow-soft'
                     : isDone
-                    ? 'bg-teal/10 text-teal-dark border-teal/20'
-                    : 'bg-white text-charcoal-light border-sage/40 hover:bg-mint hover:text-charcoal'
+                    ? 'bg-[#B8C8D7] text-[#2B2C2C] border-[#B7C5CC]'
+                    : 'bg-white text-[#737F85] border-[#B7C5CC] hover:bg-[#DEE5E8] hover:text-[#2B2C2C]'
                   }`}
               >
                 {isDone ? (
-                  <CheckCircle2 className="w-3 h-3 text-teal" />
+                  <CheckCircle2 className="w-3 h-3 text-[#525354]" />
                 ) : (
                   <Icon className="w-3 h-3" />
                 )}
                 {step.label}
               </Link>
               {idx < steps.length - 1 && (
-                <ArrowRight className="w-3 h-3 text-sage flex-shrink-0" />
+                <ArrowRight className="w-3 h-3 text-[#737F85] flex-shrink-0" />
               )}
             </React.Fragment>
           );
@@ -108,15 +108,15 @@ const WorkflowGuide = ({ currentStep = 0, compact = false, completedSteps = [] }
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-sage/30 shadow-card p-6">
+    <div className="bg-white rounded-2xl border border-[#B7C5CC] shadow-card p-6">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-sm font-bold text-charcoal">Your Workflow</h3>
-          <p className="text-xs text-charcoal-light mt-0.5">
+          <h3 className="text-sm font-bold text-[#2B2C2C]">Your Workflow</h3>
+          <p className="text-xs text-[#737F85] mt-0.5">
             Follow these 6 steps to generate a complete handover dossier
           </p>
         </div>
-        <span className="text-[11px] font-mono font-bold text-teal bg-teal/10 px-2 py-1 rounded-lg border border-teal/20">
+        <span className="text-[11px] font-mono font-bold text-[#525354] bg-[#B8C8D7] px-2 py-1 rounded-lg border border-[#B7C5CC]">
           {completedSteps.length} / {steps.length} complete
         </span>
       </div>
@@ -134,10 +134,10 @@ const WorkflowGuide = ({ currentStep = 0, compact = false, completedSteps = [] }
                 relative flex flex-col items-center text-center p-3 rounded-xl border
                 transition-all duration-200 group
                 ${isActive
-                  ? 'bg-teal border-teal shadow-soft'
+                  ? 'bg-[#181818] border-[#181818] shadow-soft'
                   : isDone
-                  ? 'bg-teal/8 border-teal/25 hover:bg-teal/12'
-                  : 'bg-ivory border-sage/30 hover:border-teal/30 hover:bg-mint/50'
+                  ? 'bg-[#B8C8D7] border-[#B7C5CC] hover:bg-[#B7C5CC]'
+                  : 'bg-[#DEE5E8] border-[#B7C5CC] hover:border-[#737F85] hover:bg-[#B8C8D7]'
                 }
               `}
             >
@@ -145,21 +145,21 @@ const WorkflowGuide = ({ currentStep = 0, compact = false, completedSteps = [] }
               <div className={`
                 absolute -top-2 -right-2 w-5 h-5 rounded-full flex items-center justify-center
                 text-[9px] font-black border
-                ${isActive ? 'bg-ivory text-teal border-teal' : isDone ? 'bg-teal text-ivory border-teal' : 'bg-white text-charcoal-light border-sage/50'}
+                ${isActive ? 'bg-[#DEE5E8] text-[#525354] border-[#181818]' : isDone ? 'bg-[#181818] text-white border-[#181818]' : 'bg-white text-[#737F85] border-[#B7C5CC]'}
               `}>
-                {isDone ? '✓' : step.id}
+                {isDone ? 'Ã¢Å“â€œ' : step.id}
               </div>
 
               <div className={`
                 w-9 h-9 rounded-xl flex items-center justify-center mb-2
-                ${isActive ? 'bg-ivory/20' : isDone ? 'bg-teal/10' : 'bg-ivory-dark'}
+                ${isActive ? 'bg-[#DEE5E8]/20' : isDone ? 'bg-[#B8C8D7]' : 'bg-[#B7C5CC]'}
               `}>
-                <Icon className={`w-4 h-4 ${isActive ? 'text-ivory' : isDone ? 'text-teal-dark' : 'text-charcoal-light'}`} />
+                <Icon className={`w-4 h-4 ${isActive ? 'text-white' : isDone ? 'text-[#525354]' : 'text-[#737F85]'}`} />
               </div>
-              <div className={`text-[11px] font-bold leading-tight ${isActive ? 'text-ivory' : isDone ? 'text-teal-dark' : 'text-charcoal'}`}>
+              <div className={`text-[11px] font-bold leading-tight ${isActive ? 'text-white' : isDone ? 'text-[#525354]' : 'text-[#2B2C2C]'}`}>
                 {step.label}
               </div>
-              <div className={`text-[10px] mt-0.5 leading-tight ${isActive ? 'text-ivory/80' : 'text-charcoal-light'}`}>
+              <div className={`text-[10px] mt-0.5 leading-tight ${isActive ? 'text-white/80' : 'text-[#737F85]'}`}>
                 {step.desc}
               </div>
             </Link>
@@ -171,3 +171,4 @@ const WorkflowGuide = ({ currentStep = 0, compact = false, completedSteps = [] }
 };
 
 export default WorkflowGuide;
+

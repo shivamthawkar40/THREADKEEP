@@ -176,6 +176,7 @@ const getProjectDocuments = async (req, res, next) => {
 
     const documents = await Document.find({
       project: project._id,
+      isDeleted: { $ne: true },
     }).sort({ createdAt: -1 });
 
     res.json({
@@ -195,6 +196,7 @@ const getDocumentById = async (req, res, next) => {
     const document = await Document.findOne({
       _id: req.params.id,
       uploadedBy: req.user._id,
+      isDeleted: { $ne: true },
     });
 
     if (!document) {
@@ -226,79 +228,165 @@ const getDocumentById = async (req, res, next) => {
   }
 };
 
-// Delete document
+// Move document to Trash (soft delete)
 const deleteDocument = async (req, res, next) => {
   try {
     const document = await Document.findOne({
       _id: req.params.id,
       uploadedBy: req.user._id,
+      isDeleted: { $ne: true },
     });
 
     if (!document) {
-      return res.status(404).json({
-        success: false,
-        message: 'Document not found',
-      });
+      return res.status(404).json({ success: false, message: 'Document not found' });
     }
 
-    const project = await getOwnedProject(
-      document.project,
-      req.user._id
-    );
-
+    const project = await getOwnedProject(document.project, req.user._id);
     if (!project) {
-      return res.status(404).json({
-        success: false,
-        message: 'Document not found',
-      });
+      return res.status(404).json({ success: false, message: 'Document not found' });
     }
 
-    // Delete Cloudinary asset first
-    if (
-      document.storageProvider === 'cloudinary' &&
-      document.cloudinaryPublicId
-    ) {
-      await cloudinary.uploader.destroy(
-        document.cloudinaryPublicId,
-        {
-          resource_type: document.cloudinaryResourceType || 'raw',
-          invalidate: true,
-        }
-      );
-    }
+    document.isDeleted = true;
+    document.deletedAt = new Date();
+    document.deletedBy = req.user._id;
+    await document.save();
 
-    // Remove legacy local file
-    if (document.filePath) {
-      removeTempFile(document.filePath);
-    }
-
-    await Document.deleteOne({
-      _id: document._id,
-    });
-
-    const totalDocs = await Document.countDocuments({
+    project.stats.totalDocuments = await Document.countDocuments({
       project: project._id,
+      isDeleted: { $ne: true },
     });
-
-    project.stats.totalDocuments = totalDocs;
     await project.save();
 
     await ActivityLog.create({
       project: project._id,
       user: req.user._id,
       userName: req.user.name,
-      action: 'document_deleted',
+      action: 'document_trashed',
       entityType: 'document',
       entityId: document._id,
-      title: `Document "${document.originalName}" removed`,
+      title: `Document "${document.originalName}" moved to Trash`,
       severity: 'warning',
     });
 
-    res.json({
-      success: true,
-      message: 'Document deleted successfully',
+    res.json({ success: true, message: 'Document moved to Trash' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// List trashed documents for an owned project
+const getTrashDocuments = async (req, res, next) => {
+  try {
+    const project = await getOwnedProject(req.params.projectId, req.user._id);
+    if (!project) {
+      return res.status(404).json({ success: false, message: 'Project not found' });
+    }
+
+    const documents = await Document.find({
+      project: project._id,
+      isDeleted: true,
+    }).sort({ deletedAt: -1 });
+
+    res.json({ success: true, count: documents.length, documents });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Restore a document from Trash
+const restoreDocument = async (req, res, next) => {
+  try {
+    const document = await Document.findOne({
+      _id: req.params.id,
+      uploadedBy: req.user._id,
+      isDeleted: true,
     });
 
+    if (!document) {
+      return res.status(404).json({ success: false, message: 'Trashed document not found' });
+    }
+
+    const project = await getOwnedProject(document.project, req.user._id);
+    if (!project) {
+      return res.status(404).json({ success: false, message: 'Document not found' });
+    }
+
+    document.isDeleted = false;
+    document.deletedAt = null;
+    document.deletedBy = null;
+    await document.save();
+
+    project.stats.totalDocuments = await Document.countDocuments({
+      project: project._id,
+      isDeleted: { $ne: true },
+    });
+    await project.save();
+
+    await ActivityLog.create({
+      project: project._id,
+      user: req.user._id,
+      userName: req.user.name,
+      action: 'document_restored',
+      entityType: 'document',
+      entityId: document._id,
+      title: `Document "${document.originalName}" restored from Trash`,
+      severity: 'info',
+    });
+
+    res.json({ success: true, message: 'Document restored successfully', document });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Permanently delete only documents already in Trash
+const permanentlyDeleteDocument = async (req, res, next) => {
+  try {
+    const document = await Document.findOne({
+      _id: req.params.id,
+      uploadedBy: req.user._id,
+      isDeleted: true,
+    });
+
+    if (!document) {
+      return res.status(404).json({ success: false, message: 'Trashed document not found' });
+    }
+
+    const project = await getOwnedProject(document.project, req.user._id);
+    if (!project) {
+      return res.status(404).json({ success: false, message: 'Document not found' });
+    }
+
+    // Remove cloud storage first. If this fails, retain the database record.
+    if (document.storageProvider === 'cloudinary' && document.cloudinaryPublicId) {
+      await cloudinary.uploader.destroy(document.cloudinaryPublicId, {
+        resource_type: document.cloudinaryResourceType || 'raw',
+        invalidate: true,
+      });
+    }
+
+    if (document.filePath) removeTempFile(document.filePath);
+
+    await Document.deleteOne({ _id: document._id });
+
+    project.stats.totalDocuments = await Document.countDocuments({
+      project: project._id,
+      isDeleted: { $ne: true },
+    });
+    await project.save();
+
+    await ActivityLog.create({
+      project: project._id,
+      user: req.user._id,
+      userName: req.user.name,
+      action: 'document_permanently_deleted',
+      entityType: 'document',
+      entityId: document._id,
+      title: `Document "${document.originalName}" permanently deleted`,
+      severity: 'warning',
+    });
+
+    res.json({ success: true, message: 'Document permanently deleted' });
   } catch (err) {
     next(err);
   }
@@ -309,4 +397,7 @@ module.exports = {
   getProjectDocuments,
   getDocumentById,
   deleteDocument,
+  getTrashDocuments,
+  restoreDocument,
+  permanentlyDeleteDocument,
 };

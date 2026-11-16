@@ -372,22 +372,22 @@ const HandoverGeneratorPage = () => {
 
       {/* HEADER */}
 
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-sage/30 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#B7C5CC] pb-5">
 
         <div>
           <div className="flex items-center gap-2">
 
-            <h1 className="text-2xl font-black text-charcoal">
+            <h1 className="text-2xl font-black text-[#181818]">
               Handover Generator
             </h1>
 
-            <Badge variant="teal">
+            <Badge variant="aqua">
               Executive Report Builder
             </Badge>
 
           </div>
 
-          <p className="text-xs text-charcoal-light mt-0.5">
+          <p className="text-xs text-[#525354] mt-0.5">
             Compile architecture, decisions, open blind spots,
             and signature sign-offs into an executive PDF dossier.
           </p>
@@ -433,13 +433,13 @@ const HandoverGeneratorPage = () => {
 
       {handovers.length > 0 && (
 
-        <div className="flex items-center justify-between bg-white p-3 rounded-xl border border-sage/30 text-xs">
+        <div className="flex items-center justify-between bg-white p-3 rounded-xl border border-[#B7C5CC] text-xs">
 
           <div className="flex items-center gap-2">
 
-            <History className="w-4 h-4 text-teal" />
+            <History className="w-4 h-4 text-[#525354]" />
 
-            <span className="font-bold text-charcoal">
+            <span className="font-bold text-[#181818]">
               Handover History:
             </span>
 
@@ -452,8 +452,8 @@ const HandoverGeneratorPage = () => {
                   onClick={() => setActiveHandover(h)}
                   className={`px-2.5 py-1 rounded text-xs font-mono font-bold transition-colors ${
                     activeHandover?._id === h._id
-                      ? 'bg-teal text-ivory'
-                      : 'bg-ivory border border-sage/20 text-charcoal hover:bg-mint/40'
+                      ? 'bg-[#181818] text-white'
+                      : 'bg-[#DEE5E8] border border-[#B7C5CC] text-[#181818] hover:bg-[#B8C8D7]/40'
                   }`}
                 >
                   v{h.version}
@@ -485,39 +485,39 @@ const HandoverGeneratorPage = () => {
 
         <div
           id="handover-report"
-          className="bg-white rounded-2xl border border-sage/40 shadow-elevated p-8 md:p-12 space-y-8 max-w-5xl mx-auto"
+          className="bg-white dark:bg-white text-[#181818] dark:text-[#181818] rounded-2xl border border-[#B7C5CC] shadow-elevated p-8 md:p-12 space-y-8 max-w-5xl mx-auto"
         >
 
           {/* REPORT HEADER */}
 
-          <div className="border-b-2 border-teal pb-6 space-y-3">
+          <div className="border-b-2 border-[#737F85] pb-6 space-y-3">
 
             <div className="flex items-center justify-between">
 
-              <span className="font-mono text-xs font-bold text-teal tracking-widest uppercase">
+              <span className="font-mono text-xs font-bold text-[#525354] tracking-widest uppercase">
                 THREADKEEP // EXECUTIVE HANDOVER DOSSIER
               </span>
 
-              <Badge variant="teal">
+              <Badge variant="aqua">
                 VERSION {activeHandover.version}
               </Badge>
 
             </div>
 
-            <h2 className="text-3xl font-extrabold text-charcoal tracking-tight">
+            <h2 className="text-3xl font-extrabold text-[#181818] tracking-tight">
               {activeHandover.title}
             </h2>
 
-            <div className="flex flex-wrap items-center gap-4 text-xs text-charcoal-light font-mono pt-1">
+            <div className="flex flex-wrap items-center gap-4 text-xs text-[#525354] font-mono pt-1">
 
               <span>
                 Project Key:
-                <strong className="text-charcoal">
+                <strong className="text-[#181818]">
                   {currentProject?.key}
                 </strong>
               </span>
 
-              <span>•</span>
+              <span aria-hidden="true">•</span>
 
               <span>
                 Generated:
@@ -525,7 +525,7 @@ const HandoverGeneratorPage = () => {
                 {new Date(activeHandover.createdAt).toLocaleDateString()}
               </span>
 
-              <span>•</span>
+              <span aria-hidden="true">•</span>
 
               <span>
                 Target Domain:
@@ -533,9 +533,9 @@ const HandoverGeneratorPage = () => {
                 {currentProject?.targetDomain || 'Core Enterprise'}
               </span>
 
-              <span>•</span>
+              <span aria-hidden="true">•</span>
 
-              <span className="text-teal font-bold">
+              <span className="text-[#525354] font-bold">
                 Health Score:
                 {' '}
                 {activeHandover.metadata?.knowledgeHealthScore || 85}%
@@ -548,9 +548,9 @@ const HandoverGeneratorPage = () => {
 
           <section className="space-y-2">
 
-            <div className="flex items-center gap-2 text-teal font-bold text-xs uppercase tracking-wider">
+            <div className="flex items-center gap-2 text-[#525354] font-bold text-xs uppercase tracking-wider">
 
-              <span className="w-2 h-2 rounded-full bg-teal" />
+              <span className="w-2 h-2 rounded-full bg-[#181818]" />
 
               <span>
                 1. Executive Summary & Context
@@ -558,7 +558,7 @@ const HandoverGeneratorPage = () => {
 
             </div>
 
-            <p className="text-sm text-charcoal leading-relaxed bg-ivory p-4 rounded-xl border border-sage/20">
+            <p className="text-sm text-[#181818] leading-relaxed bg-[#DEE5E8] p-4 rounded-xl border border-[#B7C5CC]">
               {activeHandover.sections?.projectOverview ||
                 activeHandover.summary}
             </p>
@@ -569,9 +569,9 @@ const HandoverGeneratorPage = () => {
 
           <section className="space-y-3">
 
-            <div className="flex items-center gap-2 text-teal font-bold text-xs uppercase tracking-wider">
+            <div className="flex items-center gap-2 text-[#525354] font-bold text-xs uppercase tracking-wider">
 
-              <span className="w-2 h-2 rounded-full bg-teal" />
+              <span className="w-2 h-2 rounded-full bg-[#181818]" />
 
               <span>
                 2. Strategic Objectives
@@ -586,21 +586,21 @@ const HandoverGeneratorPage = () => {
 
                   <div
                     key={idx}
-                    className="p-3.5 rounded-lg border border-sage/20 bg-ivory space-y-1 text-xs"
+                    className="p-3.5 rounded-lg border border-[#B7C5CC] bg-[#DEE5E8] space-y-1 text-xs"
                   >
 
-                    <div className="font-bold text-charcoal flex items-center justify-between">
+                    <div className="font-bold text-[#181818] flex items-center justify-between">
 
                       <span>{obj.title}</span>
 
-                      <Badge variant="teal" size="xs">
+                      <Badge variant="aqua" size="xs">
                         {obj.status || 'Verified'}
                       </Badge>
 
                     </div>
 
                     {obj.description && (
-                      <p className="text-charcoal-light text-[11px]">
+                      <p className="text-[#525354] text-[11px]">
                         {obj.description}
                       </p>
                     )}
@@ -617,9 +617,9 @@ const HandoverGeneratorPage = () => {
 
           <section className="space-y-3">
 
-            <div className="flex items-center gap-2 text-teal font-bold text-xs uppercase tracking-wider">
+            <div className="flex items-center gap-2 text-[#525354] font-bold text-xs uppercase tracking-wider">
 
-              <span className="w-2 h-2 rounded-full bg-teal" />
+              <span className="w-2 h-2 rounded-full bg-[#181818]" />
 
               <span>
                 3. Technical Architecture & Technology Stack
@@ -627,7 +627,7 @@ const HandoverGeneratorPage = () => {
 
             </div>
 
-            <p className="text-xs text-charcoal leading-relaxed">
+            <p className="text-xs text-[#181818] leading-relaxed">
               {activeHandover.sections?.technicalArchitecture?.overview}
             </p>
 
@@ -638,14 +638,14 @@ const HandoverGeneratorPage = () => {
 
                   <div
                     key={idx}
-                    className="p-2.5 rounded border border-sage/20 bg-ivory flex justify-between"
+                    className="p-2.5 rounded border border-[#B7C5CC] bg-[#DEE5E8] flex justify-between"
                   >
 
-                    <span className="text-charcoal-light text-[11px]">
+                    <span className="text-[#525354] text-[11px]">
                       {t.category}
                     </span>
 
-                    <span className="font-bold text-teal text-[11px]">
+                    <span className="font-bold text-[#525354] text-[11px]">
                       {t.technology}
                     </span>
 
@@ -662,9 +662,9 @@ const HandoverGeneratorPage = () => {
 
           <section className="space-y-3">
 
-            <div className="flex items-center gap-2 text-teal font-bold text-xs uppercase tracking-wider">
+            <div className="flex items-center gap-2 text-[#525354] font-bold text-xs uppercase tracking-wider">
 
-              <span className="w-2 h-2 rounded-full bg-teal" />
+              <span className="w-2 h-2 rounded-full bg-[#181818]" />
 
               <span>
                 4. Key Decisions & Rationale
@@ -679,14 +679,14 @@ const HandoverGeneratorPage = () => {
 
                   <div
                     key={idx}
-                    className="p-3.5 rounded-lg border border-sage/20 bg-ivory text-xs space-y-1"
+                    className="p-3.5 rounded-lg border border-[#B7C5CC] bg-[#DEE5E8] text-xs space-y-1"
                   >
 
-                    <div className="font-bold text-charcoal">
+                    <div className="font-bold text-[#181818]">
                       Decision: {d.decision}
                     </div>
 
-                    <p className="text-charcoal-light text-[11px] leading-relaxed">
+                    <p className="text-[#525354] text-[11px] leading-relaxed">
                       Rationale: {d.rationale}
                     </p>
 
@@ -705,9 +705,9 @@ const HandoverGeneratorPage = () => {
 
             <div className="flex items-center justify-between">
 
-              <div className="flex items-center gap-2 text-coral-dark font-bold text-xs uppercase tracking-wider">
+              <div className="flex items-center gap-2 text-[#525354] font-bold text-xs uppercase tracking-wider">
 
-                <span className="w-2 h-2 rounded-full bg-coral-dark" />
+                <span className="w-2 h-2 rounded-full bg-[#525354]" />
 
                 <span>
                   5. Knowledge Gap Radar (Unresolved Blindspots)
@@ -715,7 +715,7 @@ const HandoverGeneratorPage = () => {
 
               </div>
 
-              <span className="text-[11px] font-mono font-bold text-coral-dark">
+              <span className="text-[11px] font-mono font-bold text-[#737F85]">
                 {activeHandover.sections?.knowledgeGaps?.length || 0}
                 {' '}
                 Open Items
@@ -732,22 +732,22 @@ const HandoverGeneratorPage = () => {
 
                     <div
                       key={idx}
-                      className="p-3.5 rounded-lg border border-coral/30 bg-coral/10 text-xs space-y-1"
+                      className="p-3.5 rounded-lg border border-[#B7C5CC] bg-[#B7C5CC]/40 text-xs space-y-1"
                     >
 
-                      <div className="flex items-center justify-between font-bold text-charcoal">
+                      <div className="flex items-center justify-between font-bold text-[#181818]">
 
                         <span>
                           [{g.severity?.toUpperCase()}] {g.title}
                         </span>
 
-                        <Badge variant="coral" size="xs">
+                        <Badge variant="sage" size="xs">
                           Requires Action
                         </Badge>
 
                       </div>
 
-                      <p className="text-charcoal-light text-[11px]">
+                      <p className="text-[#525354] text-[11px]">
                         Recommended Action: {g.recommendation}
                       </p>
 
@@ -760,8 +760,8 @@ const HandoverGeneratorPage = () => {
 
             ) : (
 
-              <p className="text-xs text-teal font-semibold">
-                ✓ All identified knowledge gaps have been resolved and documented by human reviewers.
+              <p className="text-xs text-[#525354] font-semibold">
+                ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ All identified knowledge gaps have been resolved and documented by human reviewers.
               </p>
 
             )}
@@ -774,9 +774,9 @@ const HandoverGeneratorPage = () => {
 
             <div className="flex items-center justify-between">
 
-              <div className="flex items-center gap-2 text-gold-dark font-bold text-xs uppercase tracking-wider">
+              <div className="flex items-center gap-2 text-[#525354] font-bold text-xs uppercase tracking-wider">
 
-                <span className="w-2 h-2 rounded-full bg-gold-dark" />
+                <span className="w-2 h-2 rounded-full bg-[#525354]" />
 
                 <span>
                   6. Cross-Document Contradictions
@@ -784,7 +784,7 @@ const HandoverGeneratorPage = () => {
 
               </div>
 
-              <span className="text-[11px] font-mono font-bold text-gold-dark">
+              <span className="text-[11px] font-mono font-bold text-[#525354]">
                 {activeHandover.sections?.unresolvedConflicts?.length || 0}
                 {' '}
                 Items
@@ -801,18 +801,18 @@ const HandoverGeneratorPage = () => {
 
                     <div
                       key={idx}
-                      className="p-3.5 rounded-lg border border-gold/40 bg-gold/10 text-xs space-y-1.5"
+                      className="p-3.5 rounded-lg border border-[#B7C5CC] bg-[#B8C8D7]/30 text-xs space-y-1.5"
                     >
 
-                      <div className="font-bold text-charcoal">
+                      <div className="font-bold text-[#181818]">
                         Topic: {c.topic}
                       </div>
 
-                      <div className="text-[11px] text-charcoal-light space-y-0.5">
+                      <div className="text-[11px] text-[#525354] space-y-0.5">
 
-                        <div>• A: {c.statementA}</div>
+                        <div>ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ A: {c.statementA}</div>
 
-                        <div>• B: {c.statementB}</div>
+                        <div>ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ B: {c.statementB}</div>
 
                       </div>
 
@@ -825,8 +825,8 @@ const HandoverGeneratorPage = () => {
 
             ) : (
 
-              <p className="text-xs text-teal font-semibold">
-                ✓ No unresolved technical conflicts exist across project specifications.
+              <p className="text-xs text-[#525354] font-semibold">
+                ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ No unresolved technical conflicts exist across project specifications.
               </p>
 
             )}
@@ -837,9 +837,9 @@ const HandoverGeneratorPage = () => {
 
           <section className="space-y-3">
 
-            <div className="flex items-center gap-2 text-teal font-bold text-xs uppercase tracking-wider">
+            <div className="flex items-center gap-2 text-[#525354] font-bold text-xs uppercase tracking-wider">
 
-              <span className="w-2 h-2 rounded-full bg-teal" />
+              <span className="w-2 h-2 rounded-full bg-[#181818]" />
 
               <span>
                 7. Recommended Next Actions for Incoming Contributors
@@ -854,14 +854,14 @@ const HandoverGeneratorPage = () => {
 
                   <div
                     key={idx}
-                    className="flex items-start gap-2.5 p-3 rounded-lg bg-mint-light/40 border border-teal/20 text-xs"
+                    className="flex items-start gap-2.5 p-3 rounded-lg bg-[#B8C8D7]/40 border border-[#737F85]/20 text-xs"
                   >
 
-                    <span className="font-bold text-teal">
+                    <span className="font-bold text-[#525354]">
                       {idx + 1}.
                     </span>
 
-                    <span className="text-charcoal font-medium leading-relaxed">
+                    <span className="text-[#181818] font-medium leading-relaxed">
                       {act}
                     </span>
 
@@ -876,23 +876,23 @@ const HandoverGeneratorPage = () => {
 
           {/* SIGN-OFF BLOCK */}
 
-          <section className="pt-8 border-t-2 border-sage/30 space-y-4">
+          <section className="pt-8 border-t-2 border-[#B7C5CC] space-y-4">
 
-            <div className="font-bold text-xs uppercase tracking-wider text-charcoal">
+            <div className="font-bold text-xs uppercase tracking-wider text-[#181818]">
               Handover Verification & Formal Sign-off
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 p-6 rounded-xl border border-sage/30 bg-ivory">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 p-6 rounded-xl border border-[#B7C5CC] bg-[#DEE5E8]">
 
               <div className="space-y-4 text-xs">
 
-                <div className="text-charcoal-light font-medium">
+                <div className="text-[#525354] font-medium">
                   Outgoing Contributor / Lead:
                 </div>
 
-                <div className="border-b border-charcoal/40 h-8" />
+                <div className="border-b border-[#525354]/40 h-8" />
 
-                <div className="flex justify-between text-[11px] text-charcoal-light">
+                <div className="flex justify-between text-[11px] text-[#525354]">
                   <span>Signature</span>
                   <span>Date</span>
                 </div>
@@ -901,13 +901,13 @@ const HandoverGeneratorPage = () => {
 
               <div className="space-y-4 text-xs">
 
-                <div className="text-charcoal-light font-medium">
+                <div className="text-[#525354] font-medium">
                   Incoming Contributor / Architect:
                 </div>
 
-                <div className="border-b border-charcoal/40 h-8" />
+                <div className="border-b border-[#525354]/40 h-8" />
 
-                <div className="flex justify-between text-[11px] text-charcoal-light">
+                <div className="flex justify-between text-[11px] text-[#525354]">
                   <span>Signature</span>
                   <span>Date</span>
                 </div>
@@ -924,13 +924,13 @@ const HandoverGeneratorPage = () => {
 
         <Card className="p-12 text-center space-y-3">
 
-          <FileCheck2 className="w-12 h-12 text-sage mx-auto" />
+          <FileCheck2 className="w-12 h-12 text-[#737F85] mx-auto" />
 
-          <h3 className="text-base font-bold text-charcoal">
+          <h3 className="text-base font-bold text-[#181818]">
             No Handover Report Generated Yet
           </h3>
 
-          <p className="text-xs text-charcoal-light max-w-sm mx-auto">
+          <p className="text-xs text-[#525354] max-w-sm mx-auto">
             Click "Generate New Dossier" above to synthesize project
             knowledge, gaps, and recommendations into an executive report.
           </p>
@@ -962,7 +962,7 @@ const HandoverGeneratorPage = () => {
 
           <div>
 
-            <label className="block text-xs font-bold uppercase tracking-wider text-charcoal mb-1.5">
+            <label className="block text-xs font-bold uppercase tracking-wider text-[#181818] mb-1.5">
               Handover Dossier Title
             </label>
 
@@ -970,14 +970,14 @@ const HandoverGeneratorPage = () => {
               type="text"
               value={titleEdit}
               onChange={(e) => setTitleEdit(e.target.value)}
-              className="w-full px-3.5 py-2 rounded-lg border border-sage/40 bg-white text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-teal"
+              className="w-full px-3.5 py-2 rounded-lg border border-[#B7C5CC] bg-white text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#B8C8D7]"
             />
 
           </div>
 
           <div>
 
-            <label className="block text-xs font-bold uppercase tracking-wider text-charcoal mb-1.5">
+            <label className="block text-xs font-bold uppercase tracking-wider text-[#181818] mb-1.5">
               Executive Overview
             </label>
 
@@ -985,12 +985,12 @@ const HandoverGeneratorPage = () => {
               value={summaryEdit}
               onChange={(e) => setSummaryEdit(e.target.value)}
               rows={5}
-              className="w-full px-3.5 py-2 rounded-lg border border-sage/40 bg-white text-xs focus:outline-none focus:ring-1 focus:ring-teal"
+              className="w-full px-3.5 py-2 rounded-lg border border-[#B7C5CC] bg-white text-xs focus:outline-none focus:ring-1 focus:ring-[#B8C8D7]"
             />
 
           </div>
 
-          <div className="flex justify-end gap-2 pt-3 border-t border-ivory-dark">
+          <div className="flex justify-end gap-2 pt-3 border-t border-[#B7C5CC]">
 
             <Button
               variant="outline"

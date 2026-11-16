@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import {
   Radar,
   AlertTriangle,
@@ -27,6 +27,7 @@ const KnowledgeGapRadarPage = () => {
 
   const [gaps, setGaps] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState('');
   const [severityFilter, setSeverityFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
@@ -39,8 +40,14 @@ const KnowledgeGapRadarPage = () => {
   const [updating, setUpdating] = useState(false);
 
   const fetchGaps = async () => {
-    if (!currentProject) return;
+    if (!currentProject) {
+      setGaps([]);
+      return;
+    }
+
     setLoading(true);
+    setLoadError('');
+
     try {
       const res = await api.get(`/gaps/project/${currentProject._id}`);
       if (res.data?.success) {
@@ -48,6 +55,7 @@ const KnowledgeGapRadarPage = () => {
       }
     } catch (err) {
       console.error('Failed to load gaps:', err);
+      setLoadError(err.response?.data?.message || 'Could not load knowledge gaps. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -86,9 +94,11 @@ const KnowledgeGapRadarPage = () => {
   };
 
   const filteredGaps = gaps.filter((g) => {
-    const matchesSearch = g.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      g.explanation.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      g.whyItMatters.toLowerCase().includes(searchTerm.toLowerCase());
+    const searchableText = [
+      g.title, g.explanation, g.whyItMatters,
+      g.recommendedAction, g.relatedInfo, g.suggestedQuestion,
+    ].map(value => String(value || '')).join(' ').toLowerCase();
+    const matchesSearch = searchableText.includes(searchTerm.toLowerCase());
     const matchesSeverity = severityFilter === 'all' || g.severity === severityFilter;
     const matchesStatus = statusFilter === 'all' || g.status === statusFilter;
     return matchesSearch && matchesSeverity && matchesStatus;
@@ -97,9 +107,9 @@ const KnowledgeGapRadarPage = () => {
   const getSeverityBadge = (severity) => {
     switch (severity) {
       case 'critical':
-        return <Badge variant="coral">Critical</Badge>;
+        return <Badge variant="sage">Critical</Badge>;
       case 'high':
-        return <Badge variant="gold">High</Badge>;
+        return <Badge variant="sage">High</Badge>;
       case 'medium':
         return <Badge variant="sage">Medium</Badge>;
       default:
@@ -110,26 +120,26 @@ const KnowledgeGapRadarPage = () => {
   const getStatusBadge = (status) => {
     switch (status) {
       case 'resolved':
-        return <Badge variant="teal">Resolved</Badge>;
+        return <Badge variant="aqua">Resolved</Badge>;
       case 'not_applicable':
         return <Badge variant="gray">Not Applicable</Badge>;
       case 'reopened':
-        return <Badge variant="gold">Reopened</Badge>;
+        return <Badge variant="sage">Reopened</Badge>;
       default:
-        return <Badge variant="coral">Open</Badge>;
+        return <Badge variant="sage">Open</Badge>;
     }
   };
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-sage/30 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#B7C5CC] pb-5">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-black text-charcoal">Knowledge Gap Radar</h1>
-            <Badge variant="coral">{gaps.filter(g => g.status === 'open').length} Open Blindspots</Badge>
+            <h1 className="text-2xl font-black text-[#181818]">Knowledge Gap Radar</h1>
+            <Badge variant="sage">{gaps.filter(g => ['open', 'reopened'].includes(g.status)).length} Active Blindspots</Badge>
           </div>
-          <p className="text-xs text-charcoal-light mt-0.5">
+          <p className="text-xs text-[#737F85] mt-0.5">
             Surfaces missing task owners, undocumented deployments, incomplete tests, and unanswered questions.
           </p>
         </div>
@@ -144,25 +154,25 @@ const KnowledgeGapRadarPage = () => {
       {/* Filter & Search Bar */}
       <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
         <div className="relative w-full sm:w-80">
-          <Search className="w-4 h-4 text-charcoal-light absolute left-3 top-2.5" />
+          <Search className="w-4 h-4 text-[#737F85] absolute left-3 top-2.5" />
           <input
             type="text"
             placeholder="Search gaps, reasons, or recommended actions..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 rounded-lg border border-sage/40 bg-white text-xs focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
+            className="w-full pl-9 pr-4 py-2 rounded-lg border border-[#B7C5CC] bg-white text-xs focus:outline-none focus:ring-2 focus:ring-[#B8C8D7]/20 focus:border-[#737F85] transition-all"
           />
         </div>
 
         <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
           {/* Status Filter */}
-          <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-sage/30 text-xs">
-            {['all', 'open', 'resolved', 'not_applicable'].map((st) => (
+          <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-[#B7C5CC] text-xs">
+            {['all', 'open', 'reopened', 'resolved', 'not_applicable'].map((st) => (
               <button
                 key={st}
                 onClick={() => setStatusFilter(st)}
                 className={`px-2.5 py-1 rounded text-[11px] font-semibold capitalize transition-colors ${
-                  statusFilter === st ? 'bg-teal text-ivory' : 'text-charcoal hover:bg-ivory'
+                  statusFilter === st ? 'bg-[#181818] text-white' : 'text-[#181818] hover:bg-[#DEE5E8]'
                 }`}
               >
                 {st.replace('_', ' ')}
@@ -171,13 +181,13 @@ const KnowledgeGapRadarPage = () => {
           </div>
 
           {/* Severity Filter */}
-          <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-sage/30 text-xs">
-            {['all', 'critical', 'high', 'medium'].map((sev) => (
+          <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-[#B7C5CC] text-xs">
+            {['all', 'critical', 'high', 'medium', 'low'].map((sev) => (
               <button
                 key={sev}
                 onClick={() => setSeverityFilter(sev)}
                 className={`px-2.5 py-1 rounded text-[11px] font-semibold capitalize transition-colors ${
-                  severityFilter === sev ? 'bg-charcoal text-ivory' : 'text-charcoal hover:bg-ivory'
+                  severityFilter === sev ? 'bg-[#2B2C2C] text-white' : 'text-[#181818] hover:bg-[#DEE5E8]'
                 }`}
               >
                 {sev}
@@ -188,24 +198,31 @@ const KnowledgeGapRadarPage = () => {
       </div>
 
       {/* Gaps List */}
-      {filteredGaps.length > 0 ? (
+      {loadError ? (
+        <Card className="p-8 text-center space-y-3">
+          <AlertCircle className="w-8 h-8 text-[#737F85] mx-auto" />
+          <h3 className="font-bold text-[#181818]">Unable to load knowledge gaps</h3>
+          <p className="text-xs text-[#737F85]">{loadError}</p>
+          <Button variant="outline" size="sm" onClick={fetchGaps} loading={loading}>Try Again</Button>
+        </Card>
+      ) : filteredGaps.length > 0 ? (
         <div className="space-y-4">
           {filteredGaps.map((gap) => (
             <Card
               key={gap._id}
               className={`p-6 space-y-4 transition-all ${
                 gap.status === 'resolved'
-                  ? 'bg-mint-light/20 border-teal/30 opacity-80'
+                  ? 'bg-[#B8C8D7]/30 border-[#B7C5CC] opacity-80'
                   : gap.severity === 'critical'
-                  ? 'border-coral/40 bg-coral/10'
-                  : 'border-sage/40'
+                  ? 'border-[#B7C5CC]/40 bg-[#B7C5CC]/40'
+                  : 'border-[#B7C5CC]'
               }`}
             >
               {/* Header row */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-sage/20 pb-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#B7C5CC] pb-3">
                 <div className="flex items-center gap-2.5">
-                  <Radar className={`w-4 h-4 ${gap.severity === 'critical' ? 'text-coral-dark' : 'text-gold-dark'}`} />
-                  <h3 className="font-bold text-base text-charcoal">{gap.title}</h3>
+                  <Radar className={`w-4 h-4 ${gap.severity === 'critical' ? 'text-[#737F85]' : 'text-[#525354]'}`} />
+                  <h3 className="font-bold text-base text-[#181818]">{gap.title}</h3>
                 </div>
                 <div className="flex items-center gap-2">
                   {getSeverityBadge(gap.severity)}
@@ -217,39 +234,39 @@ const KnowledgeGapRadarPage = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                 {/* Explanation */}
                 <div className="space-y-1">
-                  <div className="font-bold uppercase tracking-wider text-[10px] text-charcoal-light">
+                  <div className="font-bold uppercase tracking-wider text-[10px] text-[#737F85]">
                     What is missing
                   </div>
-                  <p className="text-charcoal leading-relaxed">{gap.explanation}</p>
+                  <p className="text-[#181818] leading-relaxed">{gap.explanation}</p>
                 </div>
 
                 {/* Why It Matters */}
                 <div className="space-y-1">
-                  <div className="font-bold uppercase tracking-wider text-[10px] text-coral-dark">
+                  <div className="font-bold uppercase tracking-wider text-[10px] text-[#737F85]">
                     Why It Matters
                   </div>
-                  <p className="text-charcoal-light leading-relaxed">{gap.whyItMatters}</p>
+                  <p className="text-[#737F85] leading-relaxed">{gap.whyItMatters}</p>
                 </div>
               </div>
 
               {/* Suggested Question & Action */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-3 border-t border-sage/20 text-xs">
-                <div className="p-3 rounded-lg bg-ivory border border-sage/20 space-y-1">
-                  <div className="flex items-center gap-1.5 font-bold text-teal">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-3 border-t border-[#B7C5CC] text-xs">
+                <div className="p-3 rounded-lg bg-[#DEE5E8] border border-[#B7C5CC] space-y-1">
+                  <div className="flex items-center gap-1.5 font-bold text-[#525354]">
                     <HelpCircle className="w-3.5 h-3.5" />
                     <span>Suggested Question for Departing Contributor:</span>
                   </div>
-                  <p className="text-charcoal italic font-serif text-[11px] leading-relaxed">
+                  <p className="text-[#181818] italic font-serif text-[11px] leading-relaxed">
                     "{gap.suggestedQuestion}"
                   </p>
                 </div>
 
-                <div className="p-3 rounded-lg bg-mint-light/40 border border-teal/20 space-y-1">
-                  <div className="flex items-center gap-1.5 font-bold text-teal-deep">
+                <div className="p-3 rounded-lg bg-[#B8C8D7]/40 border border-[#B7C5CC] space-y-1">
+                  <div className="flex items-center gap-1.5 font-bold text-[#525354]-deep">
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     <span>Recommended Continuity Action:</span>
                   </div>
-                  <p className="text-charcoal leading-relaxed text-[11px]">
+                  <p className="text-[#181818] leading-relaxed text-[11px]">
                     {gap.recommendedAction}
                   </p>
                 </div>
@@ -257,8 +274,8 @@ const KnowledgeGapRadarPage = () => {
 
               {/* Reviewer Note if any */}
               {gap.reviewerComment && (
-                <div className="p-2.5 rounded bg-gold/10 border border-gold/30 text-xs text-charcoal flex items-start gap-2">
-                  <MessageSquare className="w-4 h-4 text-gold-dark shrink-0 mt-0.5" />
+                <div className="p-2.5 rounded bg-[#B8C8D7]/30 border border-[#B7C5CC] text-xs text-[#181818] flex items-start gap-2">
+                  <MessageSquare className="w-4 h-4 text-[#525354] shrink-0 mt-0.5" />
                   <div>
                     <span className="font-bold">Reviewer Note:</span> {gap.reviewerComment}
                   </div>
@@ -267,9 +284,9 @@ const KnowledgeGapRadarPage = () => {
 
               {/* Evidence & Action Buttons */}
               <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
-                <div className="text-[11px] text-charcoal-light flex items-center gap-2">
+                <div className="text-[11px] text-[#737F85] flex items-center gap-2">
                   {gap.evidence?.[0] && (
-                    <span className="inline-flex items-center gap-1 text-teal font-medium">
+                    <span className="inline-flex items-center gap-1 text-[#525354] font-medium">
                       <FileText className="w-3.5 h-3.5" />
                       Ref: {gap.evidence[0].documentName || 'Document record'}
                     </span>
@@ -278,7 +295,7 @@ const KnowledgeGapRadarPage = () => {
                 </div>
 
                 <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-                  {gap.status === 'open' ? (
+                  {['open', 'reopened'].includes(gap.status) ? (
                     <>
                       <Button
                         variant="secondary"
@@ -300,7 +317,7 @@ const KnowledgeGapRadarPage = () => {
                     <Button
                       variant="outline"
                       size="xs"
-                      onClick={() => handleOpenActionModal(gap, 'open')}
+                      onClick={() => handleOpenActionModal(gap, 'reopened')}
                     >
                       Reopen Gap
                     </Button>
@@ -312,10 +329,10 @@ const KnowledgeGapRadarPage = () => {
         </div>
       ) : (
         <Card className="p-12 text-center space-y-3">
-          <Radar className="w-12 h-12 text-sage mx-auto" />
-          <h3 className="text-base font-bold text-charcoal">No knowledge gaps match your filter</h3>
-          <p className="text-xs text-charcoal-light max-w-sm mx-auto">
-            All identified blindspots are resolved or filtered out.
+          <Radar className="w-12 h-12 text-[#737F85] mx-auto" />
+          <h3 className="text-base font-bold text-[#181818]">No knowledge gaps match your filter</h3>
+          <p className="text-xs text-[#737F85] max-w-sm mx-auto">
+{gaps.length === 0 ? 'No knowledge gaps have been identified for this project yet. Run knowledge reconstruction after uploading project documents.' : 'Try changing your search or filters to find the gap you need.'}
           </p>
         </Card>
       )}
@@ -329,30 +346,30 @@ const KnowledgeGapRadarPage = () => {
       >
         {selectedGap && (
           <div className="space-y-4 text-xs">
-            <div className="p-3 rounded-lg bg-ivory border border-sage/30">
-              <div className="font-bold text-charcoal text-sm">{selectedGap.title}</div>
-              <div className="text-charcoal-light text-[11px] mt-0.5">
+            <div className="p-3 rounded-lg bg-[#DEE5E8] border border-[#B7C5CC]">
+              <div className="font-bold text-[#181818] text-sm">{selectedGap.title}</div>
+              <div className="text-[#737F85] text-[11px] mt-0.5">
                 Severity: {selectedGap.severity.toUpperCase()}
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-charcoal mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#181818] mb-1.5">
                 Resolution Action
               </label>
               <select
                 value={actionStatus}
                 onChange={(e) => setActionStatus(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg border border-sage/40 bg-white text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-teal"
+                className="w-full px-3 py-2 rounded-lg border border-[#B7C5CC] bg-white text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#B8C8D7]"
               >
                 <option value="resolved">Mark as Resolved (Documented & Assigned)</option>
                 <option value="not_applicable">Mark as Not Applicable (Deprioritized)</option>
-                <option value="open">Reopen (Requires Further Investigation)</option>
+                <option value="reopened">Reopen (Requires Further Investigation)</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-charcoal mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#181818] mb-1.5">
                 Reviewer Comments & Resolution Notes
               </label>
               <textarea
@@ -360,11 +377,11 @@ const KnowledgeGapRadarPage = () => {
                 onChange={(e) => setReviewerComment(e.target.value)}
                 rows={3}
                 placeholder="Explain how this gap was resolved (e.g. Assigned to Lead QA, staging runbook documented)..."
-                className="w-full px-3 py-2 rounded-lg border border-sage/40 bg-white text-xs focus:outline-none focus:ring-1 focus:ring-teal"
+                className="w-full px-3 py-2 rounded-lg border border-[#B7C5CC] bg-white text-xs focus:outline-none focus:ring-1 focus:ring-[#B8C8D7]"
               />
             </div>
 
-            <div className="flex justify-end gap-2 pt-3 border-t border-ivory-dark">
+            <div className="flex justify-end gap-2 pt-3 border-t border-[#B7C5CC]">
               <Button variant="outline" size="sm" onClick={() => setModalOpen(false)}>
                 Cancel
               </Button>
@@ -380,3 +397,8 @@ const KnowledgeGapRadarPage = () => {
 };
 
 export default KnowledgeGapRadarPage;
+
+
+
+
+

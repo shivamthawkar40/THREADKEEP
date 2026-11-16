@@ -4,10 +4,10 @@ const HealthScoreBadge = ({ score = 0, size = 'md', showDetails = false }) => {
   const numScore = Number(score) || 0;
 
   const getColor = (s) => {
-    if (s >= 80) return { ring: '#737653', text: '#454936', bg: '#F0EDDE', label: 'Excellent' };
-    if (s >= 65) return { ring: '#C4A030', text: '#946B10', bg: '#FBF0D0', label: 'Good' };
-    if (s >= 45) return { ring: '#E8A882', text: '#C97645', bg: '#FAE8D8', label: 'Fair' };
-    return { ring: '#C97645', text: '#B05A2A', bg: '#F7DDD0', label: 'At Risk' };
+    if (s >= 80) return { ring: '#525354', text: '#181818', bg: '#DEE5E8', label: 'Excellent' };
+    if (s >= 65) return { ring: '#737F85', text: '#2B2C2C', bg: '#B8C8D7', label: 'Good' };
+    if (s >= 45) return { ring: '#95A1A6', text: '#525354', bg: '#DEE5E8', label: 'Fair' };
+    return { ring: '#525354', text: '#181818', bg: '#B7C5CC', label: 'At Risk' };
   };
 
   const colors = getColor(numScore);
@@ -41,7 +41,7 @@ const HealthScoreBadge = ({ score = 0, size = 'md', showDetails = false }) => {
             cy={svgSize / 2}
             r={radius}
             fill="none"
-            stroke="#E5DDCE"
+            stroke="#B7C5CC"
             strokeWidth={stroke}
           />
           {/* Progress */}
@@ -92,3 +92,4 @@ const HealthScoreBadge = ({ score = 0, size = 'md', showDetails = false }) => {
 };
 
 export default HealthScoreBadge;
+

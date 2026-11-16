@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+﻿const mongoose = require('mongoose');
 
 const activityLogSchema = new mongoose.Schema({
   project: {
@@ -22,6 +22,8 @@ const activityLogSchema = new mongoose.Schema({
       'document_uploaded',
       'document_processed',
       'document_deleted',
+      'document_trashed',
+      'document_restored',
       'reconstruction_started',
       'reconstruction_completed',
       'gap_identified',
@@ -68,3 +70,4 @@ const activityLogSchema = new mongoose.Schema({
 });
 
 module.exports = mongoose.model('ActivityLog', activityLogSchema);
+

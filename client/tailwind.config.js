@@ -9,79 +9,63 @@ export default {
   theme: {
     extend: {
       colors: {
-
-        // PRIMARY BRAND — PEACOCK NAVY
         primary: {
-          50: '#E8F4F3',
-          100: '#CDE8E6',
-          200: '#A1D5D1',
-          300: '#6DBDB8',
-          400: '#32B8B0',
-          DEFAULT: '#064B50',
-          600: '#07585C',
-          700: '#073F45',
-          800: '#082F38',
-          900: '#071F2B',
+          50: '#DEE5E8',
+          100: '#B8C8D7',
+          200: '#B7C5CC',
+          300: '#95A1A6',
+          400: '#737F85',
+          DEFAULT: '#181818',
+          600: '#2B2C2C',
+          700: '#525354',
+          800: '#2B2C2C',
+          900: '#181818',
         },
-
-        // PRIMARY ACTIONS
         teal: {
-          light: '#32B8B0',
-          DEFAULT: '#087E83',
-          dark: '#064B50',
-          deep: '#071F2B',
+          light: '#B8C8D7',
+          DEFAULT: '#181818',
+          dark: '#2B2C2C',
+          deep: '#181818',
         },
-
-        // PAGE BACKGROUNDS
         ivory: {
           light: '#FFFFFF',
-          DEFAULT: '#F4F5F0',
-          dark: '#E6EBE5',
-          muted: '#D5DFD9',
+          DEFAULT: '#DEE5E8',
+          dark: '#B7C5CC',
+          muted: '#95A1A6',
         },
-
-        // BORDERS AND DIVIDERS
         sage: {
-          light: '#E0EBE7',
-          DEFAULT: '#B8CCC5',
-          dark: '#7FA69B',
+          light: '#DEE5E8',
+          DEFAULT: '#B7C5CC',
+          dark: '#95A1A6',
         },
-
-        // HOVER BACKGROUNDS
         mint: {
-          light: '#EAF8F6',
-          DEFAULT: '#D5F0EC',
-          dark: '#A9DED6',
+          light: '#DEE5E8',
+          DEFAULT: '#B8C8D7',
+          dark: '#B7C5CC',
         },
-
-        // TEXT COLORS
         charcoal: {
-          light: '#526C6B',
-          DEFAULT: '#193A3D',
-          dark: '#071F2B',
+          light: '#737F85',
+          DEFAULT: '#2B2C2C',
+          dark: '#181818',
         },
-
-        // SECONDARY ACCENT
         aqua: {
-          light: '#DDF7F3',
-          DEFAULT: '#32B8B0',
-          dark: '#087E83',
+          light: '#DEE5E8',
+          DEFAULT: '#B8C8D7',
+          dark: '#737F85',
         },
-
-        // ERROR STATES
         coral: {
-          light: '#FCE4E0',
-          DEFAULT: '#E88C78',
-          dark: '#C85E50',
+          light: '#DEE5E8',
+          DEFAULT: '#737F85',
+          dark: '#525354',
         },
-
-        // GOLDEN FEATHER ACCENT
         gold: {
-          light: '#F8F0D5',
-          DEFAULT: '#D6B44A',
-          dark: '#A9892D',
+          light: '#DEE5E8',
+          DEFAULT: '#B7C5CC',
+          dark: '#95A1A6',
         },
-
+        graphite: '#525354',
+        steel: '#B7C5CC',
+        slate: '#737F85',
       },
 
       fontFamily: {
@@ -105,11 +89,11 @@ export default {
       },
 
       boxShadow: {
-        soft: '0 2px 8px -2px rgba(7, 31, 43, 0.08), 0 4px 16px -2px rgba(6, 75, 80, 0.06)',
+        soft: '0 2px 8px -2px rgba(24, 24, 24, 0.06), 0 4px 16px -2px rgba(82, 83, 84, 0.05)',
 
-        card: '0 1px 3px rgba(7, 31, 43, 0.08), 0 8px 24px -4px rgba(6, 75, 80, 0.06)',
+        card: '0 1px 3px rgba(24, 24, 24, 0.06), 0 8px 24px -4px rgba(82, 83, 84, 0.05)',
 
-        elevated: '0 12px 32px -4px rgba(7, 31, 43, 0.16), 0 4px 12px -2px rgba(6, 75, 80, 0.10)',
+        elevated: '0 12px 32px -4px rgba(24, 24, 24, 0.12), 0 4px 12px -2px rgba(82, 83, 84, 0.08)',
       },
 
       animation: {
@@ -146,3 +130,4 @@ export default {
 
   plugins: [],
 };
+

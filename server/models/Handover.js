@@ -50,6 +50,36 @@ const handoverSchema = new mongoose.Schema({
     unresolvedConflictsCount: Number,
     knowledgeHealthScore: Number,
   },
+  completeness: {
+  score: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 100,
+  },
+
+  status: {
+    type: String,
+    enum: ['complete', 'needs_attention', 'incomplete'],
+    default: 'incomplete',
+  },
+
+  warnings: [{
+    code: String,
+    title: String,
+    description: String,
+    severity: {
+      type: String,
+      enum: ['critical', 'high', 'medium', 'low'],
+    },
+  }],
+
+  checks: [{
+    name: String,
+    passed: Boolean,
+    details: String,
+  }],
+},
   pdfPath: {
     type: String,
     default: '',

@@ -30,7 +30,6 @@ const generateHandoverPDF = async (handover, project) => {
         throw new Error('Handover or project data is missing.');
       }
 
-      // Ensure uploads directory exists
       fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
       const fileName = `handover-${project.key || 'PROJ'}-${Date.now()}.pdf`;
@@ -145,10 +144,15 @@ const generateHandoverPDF = async (handover, project) => {
       };
 
       const addBullet = (text) => {
-        addParagraph(`• ${text}`, { x: 65, width: 465, spacing: 6 });
+        addParagraph(`• ${text}`, {
+          x: 65,
+          width: 465,
+          spacing: 6,
+        });
       };
 
-      const safeArray = (value) => Array.isArray(value) ? value : [];
+      const safeArray = (value) =>
+        Array.isArray(value) ? value : [];
 
       // =====================================
       // HEADER
@@ -204,7 +208,7 @@ const generateHandoverPDF = async (handover, project) => {
         .fontSize(9)
         .fillColor(charcoal)
         .text(
-          `Version: ${handover.version || '1.0.0'}  |  Status: ${handover.status || 'Draft'}`,
+          `Version: ${handover.version || '1.0.0'} | Status: ${handover.status || 'Draft'}`,
           65,
           y + 36
         );
@@ -237,7 +241,9 @@ const generateHandoverPDF = async (handover, project) => {
 
       addSectionTitle('2. Project Objectives');
 
-      const objectives = safeArray(handover.sections?.projectObjectives);
+      const objectives = safeArray(
+        handover.sections?.projectObjectives
+      );
 
       if (objectives.length) {
         objectives.forEach((obj, index) => {
@@ -255,7 +261,9 @@ const generateHandoverPDF = async (handover, project) => {
           }
         });
       } else {
-        addParagraph('No explicit objectives recorded.');
+        addParagraph('No explicit objectives recorded.', {
+          color: coral,
+        });
       }
 
       // =====================================
@@ -269,18 +277,44 @@ const generateHandoverPDF = async (handover, project) => {
         'Technical architecture details are not documented.'
       );
 
+      const architectureComponents = safeArray(
+        handover.sections?.technicalArchitecture?.components
+      );
+
+      if (architectureComponents.length) {
+        architectureComponents.forEach((component) => {
+          addBullet(
+            `${component.name || 'Unnamed component'}: ${
+              component.role || 'Role not documented'
+            }${
+              safeArray(component.technologies).length
+                ? ` | Technologies: ${component.technologies.join(', ')}`
+                : ''
+            }`
+          );
+        });
+      }
+
       // =====================================
       // 4. TECHNOLOGY STACK
       // =====================================
 
       addSectionTitle('4. Technology Stack');
 
-      const techStack = safeArray(handover.sections?.technologyStack);
+      const techStack = safeArray(
+        handover.sections?.technologyStack
+      );
 
       if (techStack.length) {
         techStack.forEach((item) => {
           addBullet(
-            `${item.category || 'Core'}: ${item.technology || item} | Version: ${item.version || 'Latest'} | Status: ${item.status || 'Verified'}`
+            `${item.category || 'Core'}: ${
+              item.technology || item
+            } | Version: ${
+              item.version || 'Not specified'
+            } | Status: ${
+              item.status || 'Not specified'
+            }`
           );
         });
       } else {
@@ -293,18 +327,25 @@ const generateHandoverPDF = async (handover, project) => {
 
       addSectionTitle('5. Key Decisions & Rationale');
 
-      const decisions = safeArray(handover.sections?.importantDecisions);
+      const decisions = safeArray(
+        handover.sections?.importantDecisions
+      );
 
       if (decisions.length) {
         decisions.forEach((item, index) => {
           addParagraph(
-            `${index + 1}. Decision: ${item.decision || 'Not specified'}`,
+            `${index + 1}. Decision: ${
+              item.decision || 'Not specified'
+            }`,
             { bold: true }
           );
 
           addParagraph(
             `Rationale: ${item.rationale || 'Not documented.'}`,
-            { x: 75, width: 450 }
+            {
+              x: 75,
+              width: 450,
+            }
           );
         });
       } else {
@@ -317,20 +358,34 @@ const generateHandoverPDF = async (handover, project) => {
 
       addSectionTitle('6. Knowledge Gap Radar');
 
-      const gaps = safeArray(handover.sections?.knowledgeGaps);
+      const gaps = safeArray(
+        handover.sections?.knowledgeGaps
+      );
 
       if (gaps.length) {
         gaps.forEach((gap) => {
           checkPage(45);
 
           addParagraph(
-            `[${String(gap.severity || 'Medium').toUpperCase()}] ${gap.title || 'Untitled Gap'}`,
-            { bold: true, color: coral }
+            `[${String(gap.severity || 'Medium').toUpperCase()}] ${
+              gap.title || 'Untitled Gap'
+            }`,
+            {
+              bold: true,
+              color: coral,
+            }
           );
 
           addParagraph(
-            `Recommended Action: ${gap.recommendation || gap.recommendedAction || 'Review documented workstreams.'}`,
-            { x: 75, width: 450 }
+            `Recommended Action: ${
+              gap.recommendation ||
+              gap.recommendedAction ||
+              'Review documented workstreams.'
+            }`,
+            {
+              x: 75,
+              width: 450,
+            }
           );
         });
       } else {
@@ -345,23 +400,44 @@ const generateHandoverPDF = async (handover, project) => {
 
       addSectionTitle('7. Cross-Document Conflicts');
 
-      const conflicts = safeArray(handover.sections?.unresolvedConflicts);
+      const conflicts = safeArray(
+        handover.sections?.unresolvedConflicts
+      );
 
       if (conflicts.length) {
         conflicts.forEach((conflict) => {
           addParagraph(
-            `Topic: ${conflict.topic || 'Not specified'} | Severity: ${conflict.severity || 'High'}`,
-            { bold: true, color: coral }
+            `Topic: ${conflict.topic || 'Not specified'} | Severity: ${
+              conflict.severity || 'High'
+            }`,
+            {
+              bold: true,
+              color: coral,
+            }
           );
 
           addParagraph(
-            `Statement A: ${conflict.statementA || conflict.claimA || 'Not documented.'}`,
-            { x: 75, width: 450 }
+            `Statement A: ${
+              conflict.statementA ||
+              conflict.claimA ||
+              'Not documented.'
+            }`,
+            {
+              x: 75,
+              width: 450,
+            }
           );
 
           addParagraph(
-            `Statement B: ${conflict.statementB || conflict.claimB || 'Not documented.'}`,
-            { x: 75, width: 450 }
+            `Statement B: ${
+              conflict.statementB ||
+              conflict.claimB ||
+              'Not documented.'
+            }`,
+            {
+              x: 75,
+              width: 450,
+            }
           );
         });
       } else {
@@ -389,7 +465,165 @@ const generateHandoverPDF = async (handover, project) => {
       }
 
       // =====================================
-      // 9. SIGN-OFF
+      // 9. HANDOVER COMPLETENESS REPORT
+      // =====================================
+
+      addSectionTitle('9. Handover Completeness Report');
+
+      const completeness = handover.completeness || {};
+
+      const rawScore = completeness.score;
+
+      const completenessScore =
+        rawScore !== null &&
+        rawScore !== undefined &&
+        rawScore !== '' &&
+        Number.isFinite(Number(rawScore))
+          ? Math.max(0, Math.min(100, Number(rawScore)))
+          : null;
+
+      const completenessStatus =
+        completeness.status || 'not_calculated';
+
+      const checks = safeArray(completeness.checks);
+      const warnings = safeArray(completeness.warnings);
+
+      // Completeness Score Card
+
+      checkPage(90);
+
+      doc
+        .roundedRect(60, y, 465, 65, 6)
+        .fill(lightBg);
+
+      doc
+        .font('Helvetica-Bold')
+        .fontSize(10)
+        .fillColor(teal)
+        .text(
+          'HANDOVER COMPLETENESS SCORE',
+          75,
+          y + 10
+        );
+
+      doc
+        .font('Helvetica-Bold')
+        .fontSize(22)
+        .fillColor(
+          completenessScore === null
+            ? muted
+            : completenessScore >= 90
+              ? teal
+              : coral
+        )
+        .text(
+          completenessScore === null
+            ? 'N/A'
+            : `${Math.round(completenessScore)}%`,
+          75,
+          y + 29
+        );
+
+      doc
+        .font('Helvetica-Bold')
+        .fontSize(9)
+        .fillColor(charcoal)
+        .text(
+          `Status: ${String(completenessStatus)
+            .replace(/_/g, ' ')
+            .toUpperCase()}`,
+          260,
+          y + 37,
+          {
+            width: 245,
+          }
+        );
+
+      y += 80;
+
+      // VALIDATION CHECKS
+
+      addParagraph('VALIDATION CHECKS', {
+        bold: true,
+        color: teal,
+      });
+
+      if (checks.length > 0) {
+        checks.forEach((check) => {
+          checkPage(45);
+
+          addParagraph(
+            `${check.passed ? '[PASS]' : '[FAIL]'} ${
+              check.name || 'Validation check'
+            }`,
+            {
+              bold: true,
+              color: check.passed ? teal : coral,
+              spacing: 4,
+            }
+          );
+
+          if (check.details) {
+            addParagraph(check.details, {
+              x: 75,
+              width: 450,
+              color: muted,
+            });
+          }
+        });
+      } else {
+        addParagraph('No validation checks available.', {
+          color: muted,
+        });
+      }
+
+      // WARNINGS AND MISSING INFORMATION
+
+      checkPage(45);
+
+      addParagraph('WARNINGS & MISSING INFORMATION', {
+        bold: true,
+        color: coral,
+      });
+
+      if (warnings.length > 0) {
+        warnings.forEach((warning) => {
+          checkPage(45);
+
+          addParagraph(
+            `[${String(warning.severity || 'medium').toUpperCase()}] ${
+              warning.title || 'Handover warning'
+            }`,
+            {
+              bold: true,
+              color: coral,
+              spacing: 4,
+            }
+          );
+
+          if (warning.description) {
+            addParagraph(warning.description, {
+              x: 75,
+              width: 450,
+              color: muted,
+            });
+          }
+        });
+      } else if (completenessScore !== null) {
+        addParagraph('No completeness warnings recorded.', {
+          color: teal,
+        });
+      } else {
+        addParagraph(
+          'Completeness validation has not been calculated for this dossier.',
+          {
+            color: muted,
+          }
+        );
+      }
+
+      // =====================================
+      // 10. SIGN-OFF
       // =====================================
 
       checkPage(100);
@@ -406,7 +640,11 @@ const generateHandoverPDF = async (handover, project) => {
         .font('Helvetica-Bold')
         .fontSize(10)
         .fillColor(teal)
-        .text('HANDOVER SIGN-OFF & VERIFICATION', 65, y + 10);
+        .text(
+          'HANDOVER SIGN-OFF & VERIFICATION',
+          65,
+          y + 10
+        );
 
       doc
         .font('Helvetica')
